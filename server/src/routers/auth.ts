@@ -21,7 +21,7 @@ router.get("/access-token", (_req: Request, res: Response) => {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + btoa(SPOTIFY_CLIENT_ID + ":" + SPOTIFY_CLIENT_SECRET),
+      Authorization: "Basic " + btoa("aaaaaa" + ":" + SPOTIFY_CLIENT_SECRET),
     },
     body: new URLSearchParams({
       grant_type: "client_credentials",
@@ -30,6 +30,9 @@ router.get("/access-token", (_req: Request, res: Response) => {
     .then(response => response.json())
     .then(data => {
       res.status(StatusCode.OK).send(data); //COMMENT: 200
+    })
+    .catch(error => {
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).send(error); //COMMENT: 500
     });
 });
 
