@@ -6,6 +6,7 @@ import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
 import { useQuery } from "react-query";
+import { useSearchParams } from "react-router-dom";
 
 const ONE_HOUR_MS = 1000 * 60 * 60;
 
@@ -27,6 +28,7 @@ function App() {
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
   });
+  const [searchParams] = useSearchParams();
 
   const serverError = data && data.error;
 
@@ -39,7 +41,7 @@ function App() {
       return;
     }
 
-    // https://www.w3resource.com/javascript/form/email-validation.php
+    // Fonte: https://www.w3resource.com/javascript/form/email-validation.php
     // eslint-disable-next-line no-useless-escape
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -54,8 +56,8 @@ function App() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: email,
-        password: password,
+        email,
+        password,
       }),
     });
     const data = await response.json();
@@ -65,7 +67,9 @@ function App() {
       return;
     }
 
-    console.log(data);
+    // per semplicità, salvo l'utente in localStorage, ma in un'applicazione
+    // reale sarebbe meglio usare un sistema di autenticazione basato su token
+    localStorage.setItem("user", JSON.stringify(data));
   };
 
   if (!serverError && data) {
@@ -83,6 +87,11 @@ function App() {
         {error && (
           <p className="text-red-500 bg-red-200 px-4 rounded-xl py-1 text-sm mb-1">
             {error}
+          </p>
+        )}
+        {searchParams.get("success") && (
+          <p className="text-green-500 bg-green-200 px-4 rounded-xl py-1 text-sm mb-1">
+            {searchParams.get("success")}
           </p>
         )}
         <Input
