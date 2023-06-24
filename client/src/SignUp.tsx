@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 function App() {
@@ -55,14 +56,11 @@ function App() {
     navigate("/?success=Utente registrato correttamente");
   };
 
+  if (error) toast.error(error);
+
   return (
     <>
       <CenteredContainer className="mb-2 flex-col gap-2">
-        {error && (
-          <p className="text-red-500 bg-red-200 px-4 rounded-xl py-1 text-sm mb-1">
-            {error}
-          </p>
-        )}
         <Input
           variant="neutral"
           size="sm"

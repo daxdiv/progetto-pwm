@@ -1,12 +1,13 @@
 import "./styles/globals.css";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
+import { toast } from "react-hot-toast";
 import { useQuery } from "react-query";
-import { useSearchParams } from "react-router-dom";
 
 const ONE_HOUR_MS = 1000 * 60 * 60;
 
@@ -29,6 +30,7 @@ function App() {
     refetchOnWindowFocus: false,
   });
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const serverError = data && data.error;
 
@@ -70,7 +72,14 @@ function App() {
     // per semplicità, salvo l'utente in localStorage, ma in un'applicazione
     // reale sarebbe meglio usare un sistema di autenticazione basato su token
     localStorage.setItem("user", JSON.stringify(data));
+    navigate("/dashboard");
   };
+
+  // TODO: pensare a un modo migliore per mostrare gli errori
+  if (serverError) toast.error(serverError);
+  if (searchParams.get("error")) toast.error(searchParams.get("error"));
+  if (error) toast.error(error);
+  if (searchParams.get("success")) toast.success(searchParams.get("success"));
 
   if (!serverError && data) {
     localStorage.setItem("access_token", data.access_token);
@@ -79,21 +88,6 @@ function App() {
   return (
     <>
       <CenteredContainer className="mb-2 flex-col gap-2">
-        {serverError && (
-          <p className="text-red-500 bg-red-200 px-4 rounded-xl py-1 text-sm mb-1">
-            Errore server: {data.error}
-          </p>
-        )}
-        {error && (
-          <p className="text-red-500 bg-red-200 px-4 rounded-xl py-1 text-sm mb-1">
-            {error}
-          </p>
-        )}
-        {searchParams.get("success") && (
-          <p className="text-green-500 bg-green-200 px-4 rounded-xl py-1 text-sm mb-1">
-            {searchParams.get("success")}
-          </p>
-        )}
         <Input
           variant="neutral"
           size="sm"
