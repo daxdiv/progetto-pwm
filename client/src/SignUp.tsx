@@ -1,19 +1,45 @@
 import "./styles/globals.css";
 
-import { useRef, useState } from "react";
-
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
+import Select from "./components/ui/Select";
+import { Triangle } from "react-loader-spinner";
+import { delay } from "./utils/delay";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "react-query";
+import { useRef } from "react";
+
+type Error = { status: number; message: string };
+type Response = { genres: string[] };
 
 function App() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string | null>(null);
+  const genreRef = useRef<HTMLSelectElement>(null);
   const navigate = useNavigate();
+  const { data, isLoading } = useQuery<Response, Error>({
+    queryKey: ["fetch-genres"],
+    queryFn: async () => {
+      await delay();
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SPOTIFY_BASE_URL}/recommendations/available-genre-seeds`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      return await response.json();
+    },
+    onError: error => {
+      toast.error(error.message);
+    },
+  });
 
   const handleSignUp = async () => {
     const username = usernameRef.current?.value;
@@ -21,7 +47,7 @@ function App() {
     const password = passwordRef.current?.value;
 
     if (!username || !email || !password) {
-      setError("Compila tutti i campi");
+      toast.error("Compila tutti i campi");
       return;
     }
 
@@ -30,7 +56,7 @@ function App() {
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
     if (!emailRegex.test(email)) {
-      setError("Email non valida");
+      toast.error("Email non valida");
       return;
     }
 
@@ -49,14 +75,12 @@ function App() {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.message);
+      toast.error(data.message);
       return;
     }
 
     navigate("/?success=Utente registrato correttamente");
   };
-
-  if (error) toast.error(error);
 
   return (
     <>
@@ -82,6 +106,24 @@ function App() {
           type="password"
           ref={passwordRef}
         />
+        {isLoading ? (
+          <Triangle
+            height="40"
+            width="40"
+            color="#059669"
+            ariaLabel="triangle-loading"
+            visible={true}
+          />
+        ) : (
+          <Select
+            size="sm"
+            placeholder="Seleziona i generi musicali"
+            className="text-xs"
+            data={data?.genres || []}
+            ref={genreRef}
+          />
+        )}
+
         <Button
           type="button"
           text="Registrati"

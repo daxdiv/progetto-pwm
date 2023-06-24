@@ -1,11 +1,13 @@
 import "./styles/globals.css";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
+import { Triangle } from "react-loader-spinner";
+import { delay } from "./utils/delay";
 import { toast } from "react-hot-toast";
 import { useQuery } from "react-query";
 
@@ -14,10 +16,11 @@ const ONE_HOUR_MS = 1000 * 60 * 60;
 function App() {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string | null>(null);
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: "get-access-token",
     queryFn: async () => {
+      await delay();
+
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/auth/access-token`
       );
@@ -39,7 +42,7 @@ function App() {
     const password = passwordRef.current?.value;
 
     if (!email || !password) {
-      setError("Compila tutti i campi");
+      toast.error("Compila tutti i campi");
       return;
     }
 
@@ -48,7 +51,7 @@ function App() {
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
     if (!emailRegex.test(email)) {
-      setError("Email non valida");
+      toast.error("Email non valida");
       return;
     }
 
@@ -65,7 +68,7 @@ function App() {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.error);
+      toast.error(data.error);
       return;
     }
 
@@ -75,11 +78,10 @@ function App() {
     navigate("/dashboard");
   };
 
-  // TODO: pensare a un modo migliore per mostrare gli errori
-  if (serverError) toast.error(serverError);
-  if (searchParams.get("error")) toast.error(searchParams.get("error"));
-  if (error) toast.error(error);
-  if (searchParams.get("success")) toast.success(searchParams.get("success"));
+  // TODO: risolvere doppio render
+  useEffect(() => {
+    if (searchParams.get("success")) toast.success(searchParams.get("success"));
+  }, [searchParams]);
 
   if (!serverError && data) {
     localStorage.setItem("access_token", data.access_token);
@@ -88,37 +90,49 @@ function App() {
   return (
     <>
       <CenteredContainer className="mb-2 flex-col gap-2">
-        <Input
-          variant="neutral"
-          size="sm"
-          placeholder="Email"
-          type="email"
-          ref={emailRef}
-        />
-        <Input
-          variant="neutral"
-          size="sm"
-          placeholder="Password"
-          type="password"
-          ref={passwordRef}
-        />
-        <Button
-          type="button"
-          text="Login"
-          className="mt-2"
-          onClick={handleSignIn}
-          // className={clsx({ "cursor-not-allowed": isLoading })}
-        />
+        {isLoading ? (
+          <Triangle
+            height="80"
+            width="80"
+            color="#059669"
+            ariaLabel="triangle-loading"
+            visible={true}
+          />
+        ) : (
+          <>
+            <Input
+              variant="neutral"
+              size="sm"
+              placeholder="Email"
+              type="email"
+              ref={emailRef}
+            />
+            <Input
+              variant="neutral"
+              size="sm"
+              placeholder="Password"
+              type="password"
+              ref={passwordRef}
+            />
 
-        <p className="text-sm mt-3">
-          Non hai un account?{" "}
-          <a
-            href="/sign-up"
-            className="text-emerald-600 hover:underline"
-          >
-            Registrati
-          </a>
-        </p>
+            <Button
+              type="button"
+              text="Login"
+              className="mt-2"
+              onClick={handleSignIn}
+              // className={clsx({ "cursor-not-allowed": isLoading })}
+            />
+            <p className="text-sm mt-3">
+              Non hai un account?{" "}
+              <a
+                href="/sign-up"
+                className="text-emerald-600 hover:underline"
+              >
+                Registrati
+              </a>
+            </p>
+          </>
+        )}
       </CenteredContainer>
     </>
   );
