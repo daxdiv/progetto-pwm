@@ -3,20 +3,40 @@ import "./styles/globals.css";
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
-import { useEffect } from "react";
+import { useQuery } from "react-query";
+
+const ONE_HOUR_MS = 1000 * 60 * 60;
 
 function App() {
-  useEffect(() => {
-    fetch("http://localhost:3001/auth/access-token")
-      .then(res => res.json())
-      .then(data => {
-        localStorage.setItem("access-token", data.accessToken);
-      });
-  }, []);
+  const { data } = useQuery({
+    queryKey: "get-access-token",
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/access-token`
+      );
+      const data = await response.json();
+
+      return data;
+    },
+    refetchInterval: ONE_HOUR_MS,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const error = data && data.error;
+
+  if (!error && data) {
+    localStorage.setItem("access_token", data.access_token);
+  }
 
   return (
     <>
       <CenteredContainer className="mb-2 flex-col gap-2">
+        {error && (
+          <p className="text-red-500 bg-red-200 px-4 rounded-xl py-1 text-sm">
+            {data.error}
+          </p>
+        )}
         <Input
           variant="neutral"
           size="sm"
