@@ -57,4 +57,30 @@ router.post("/sign-in", async (req: Request, res: Response) => {
   }
 });
 
+router.post("/sign-up", async (req: Request, res: Response) => {
+  const { username, email, password } = req.body;
+  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+  if (!emailRegex.test(email)) {
+    res.status(StatusCode.BAD_REQUEST).json({ message: "Email non valida" }); //COMMENT: 400
+    return;
+  }
+
+  const user = new User({ username, email, password });
+
+  try {
+    const duplicate = await User.findOne({ username });
+
+    if (duplicate) {
+      res.status(StatusCode.BAD_REQUEST).json({ message: "Username già usato" }); //COMMENT: 400
+      return;
+    }
+
+    await user.save();
+    res.status(StatusCode.CREATED).json(user); //COMMENT: 201
+  } catch (error) {
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: error.message }); //COMMENT: 500
+  }
+});
+
 export default router;
