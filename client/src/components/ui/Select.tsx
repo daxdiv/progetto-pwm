@@ -33,8 +33,8 @@ const selectVariants = cva(
 const Select = forwardRef<HTMLSelectElement, Props>(
   ({ size, className, placeholder, data, ...props }, ref) => {
     return (
-      <div className="relative">
-        <BiSolidDownArrow className="absolute right-4 top-[0.9rem] text-emerald-600 text-sm" />
+      <div className="relative cursor-pointer">
+        <BiSolidDownArrow className="absolute right-4 top-[0.9rem] text-emerald-600 text-sm pointer-events-none" />
         <select
           ref={ref}
           placeholder={placeholder || "Placeholder"}
