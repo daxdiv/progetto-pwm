@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  preferredGenres: {
+    type: [String],
+    default: [],
+  },
 });
 
 export default mongoose.model("User", userSchema);
