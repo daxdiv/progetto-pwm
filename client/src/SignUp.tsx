@@ -14,7 +14,7 @@ import { useRef } from "react";
 type Error = { status: number; message: string };
 type Response = { genres: string[] };
 
-function App() {
+function SignUp() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -146,4 +146,4 @@ function App() {
   );
 }
 
-export default App;
+export default SignUp;
