@@ -34,7 +34,7 @@ router.get("/access-token", (_req: Request, res: Response) => {
     .catch(() => {
       res
         .status(StatusCode.INTERNAL_SERVER_ERROR)
-        .send({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+        .send({ message: "Errore lato server, riprovare più tardi" }); //COMMENT: 500
     });
 });
 
@@ -47,7 +47,7 @@ router.post("/sign-in", async (req: Request, res: Response) => {
     if (!user) {
       res
         .status(StatusCode.NOT_FOUND)
-        .json({ message: "Nessun utente trovato con queste credenziali" }); //COMMENT: 404
+        .json({ error: "Nessun utente trovato con queste credenziali" }); //COMMENT: 404
       return;
     }
 
