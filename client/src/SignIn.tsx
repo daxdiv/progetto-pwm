@@ -13,7 +13,7 @@ import { useQuery } from "react-query";
 
 const ONE_HOUR_MS = 1000 * 60 * 60;
 
-function App() {
+function SignIn() {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const { data, isLoading } = useQuery({
@@ -138,4 +138,4 @@ function App() {
   );
 }
 
-export default App;
+export default SignIn;
