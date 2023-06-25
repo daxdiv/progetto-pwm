@@ -2,7 +2,8 @@ import "./styles/globals.css";
 
 import { Route, Routes } from "react-router-dom";
 
-import Dashboard from "./Dashboard";
+import Navbar from "./components/Navbar";
+import Profile from "./components/Profile";
 import Protected from "./Protected";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
@@ -12,6 +13,7 @@ function App() {
   return (
     <>
       <Toaster />
+      <Navbar />
       <Routes>
         <Route
           path="/"
@@ -22,10 +24,10 @@ function App() {
           element={<SignUp />}
         />
         <Route
-          path="/dashboard"
+          path="/profile"
           element={
             <Protected>
-              <Dashboard />
+              <Profile />
             </Protected>
           }
         />
