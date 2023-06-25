@@ -58,7 +58,7 @@ router.post("/sign-in", async (req: Request, res: Response) => {
 });
 
 router.post("/sign-up", async (req: Request, res: Response) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, preferredGenres } = req.body;
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
   if (!emailRegex.test(email)) {
@@ -66,7 +66,7 @@ router.post("/sign-up", async (req: Request, res: Response) => {
     return;
   }
 
-  const user = new User({ username, email, password });
+  const user = new User({ username, email, password, preferredGenres });
 
   try {
     const duplicate = await User.findOne({ username });
