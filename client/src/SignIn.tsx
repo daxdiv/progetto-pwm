@@ -81,6 +81,7 @@ function SignIn() {
   // TODO: risolvere doppio render
   useEffect(() => {
     if (searchParams.get("success")) toast.success(searchParams.get("success"));
+    if (searchParams.get("error")) toast.error(searchParams.get("error"));
   }, [searchParams]);
 
   if (!serverError && data) {
