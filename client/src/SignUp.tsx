@@ -1,15 +1,18 @@
 import "./styles/globals.css";
 
+import { useRef, useState } from "react";
+
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
+import { FaTrashAlt } from "react-icons/fa";
 import Input from "./components/ui/Input";
 import Select from "./components/ui/Select";
 import { Triangle } from "react-loader-spinner";
+import clsx from "clsx";
 import { delay } from "./utils/delay";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
-import { useRef } from "react";
 
 type Error = { status: number; message: string };
 type Response = { genres: string[] };
@@ -18,7 +21,7 @@ function SignUp() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const genreRef = useRef<HTMLSelectElement>(null);
+  const [selectedGenres, setSelectedGenres] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
   const { data, isLoading } = useQuery<Response, Error>({
     queryKey: ["fetch-genres"],
@@ -69,6 +72,7 @@ function SignUp() {
         username,
         email,
         password,
+        preferredGenres: Array.from(selectedGenres),
       }),
     });
 
@@ -120,16 +124,54 @@ function SignUp() {
             placeholder="Seleziona i generi musicali"
             className="text-xs"
             data={data?.genres || []}
-            ref={genreRef}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              const genre = e.target.value;
+
+              setSelectedGenres(prevGenres => new Set(prevGenres.add(genre)));
+            }}
           />
+        )}
+
+        {selectedGenres.size !== 0 && (
+          <>
+            <p className="text-sm font-normal">Generi musicali selezionati:</p>
+
+            <ul className="grid grid-cols-2 font-normal text-xs gap-2">
+              {Array.from(selectedGenres).map(genre => (
+                <li
+                  key={`selected-${genre}`}
+                  className="text-white bg-gray-700 w-full rounded-xl px-2 py-1 flex items-center justify-between gap-1"
+                >
+                  <span>{genre}</span>
+                  <FaTrashAlt
+                    className="text-red-500 font-bold cursor-pointer hover:scale-105 transition-transform"
+                    onClick={() => {
+                      setSelectedGenres(prevGenres => {
+                        const newGenres = new Set(prevGenres);
+                        newGenres.delete(genre);
+
+                        return newGenres;
+                      });
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          </>
         )}
 
         <Button
           type="button"
           text="Registrati"
-          className="mt-2"
           onClick={handleSignUp}
-          // className={clsx({ "cursor-not-allowed": isLoading })}
+          disabled={isLoading}
+          className={clsx(
+            {
+              "cursor-not-allowed": isLoading,
+              "bg-emerald-800": isLoading,
+            },
+            "mt-2"
+          )}
         />
 
         <p className="text-sm mt-3">
