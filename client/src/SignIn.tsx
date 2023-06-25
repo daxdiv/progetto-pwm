@@ -75,7 +75,7 @@ function SignIn() {
     // per semplicità, salvo l'utente in localStorage, ma in un'applicazione
     // reale sarebbe meglio usare un sistema di autenticazione basato su token
     localStorage.setItem("user", JSON.stringify(data));
-    navigate("/dashboard");
+    navigate("/profile");
   };
 
   // TODO: risolvere doppio render
