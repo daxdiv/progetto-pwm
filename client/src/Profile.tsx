@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-import Button from "./ui/Button";
-import CenteredContainer from "./ui/CenteredContainer";
+import Button from "./components/ui/Button";
+import CenteredContainer from "./components/ui/CenteredContainer";
 import { FaTrashAlt } from "react-icons/fa";
-import Input from "./ui/Input";
+import Input from "./components/ui/Input";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 

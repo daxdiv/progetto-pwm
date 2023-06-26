@@ -18,6 +18,22 @@ function Navbar() {
             Profilo
           </Link>
         </li>
+        <li>
+          <Link
+            to="/playlist/new"
+            className="text-inherit hover:text-emerald-600"
+          >
+            Crea playlist
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/sign-up"
+            className="text-inherit hover:text-emerald-600"
+          >
+            Registrati
+          </Link>
+        </li>
       </ul>
     </nav>
   );
