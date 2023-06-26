@@ -22,6 +22,7 @@ function SignUp() {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const [selectedGenres, setSelectedGenres] = useState<Set<string>>(new Set());
+  const [description, setDescription] = useState("");
   const navigate = useNavigate();
   const { data, isLoading } = useQuery<Response, Error>({
     queryKey: ["fetch-genres"],
@@ -73,6 +74,7 @@ function SignUp() {
         email,
         password,
         preferredGenres: Array.from(selectedGenres),
+        description,
       }),
     });
 
@@ -119,22 +121,25 @@ function SignUp() {
             visible={true}
           />
         ) : (
-          <Select
-            size="sm"
-            placeholder="Seleziona i generi musicali"
-            className="text-xs"
-            data={data?.genres || []}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              const genre = e.target.value;
+          <>
+            <p className="text-xs font-normal">Seleziona i generi musicali preferiti:</p>
+            <Select
+              size="sm"
+              placeholder="Seleziona i generi musicali"
+              className="text-xs"
+              data={data?.genres || []}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                const genre = e.target.value;
 
-              setSelectedGenres(prevGenres => new Set(prevGenres.add(genre)));
-            }}
-          />
+                setSelectedGenres(prevGenres => new Set(prevGenres.add(genre)));
+              }}
+            />
+          </>
         )}
 
         {selectedGenres.size !== 0 && (
           <>
-            <p className="text-sm font-normal">Generi musicali selezionati:</p>
+            <p className="text-xs font-normal">Generi musicali selezionati:</p>
 
             <ul className="grid grid-cols-2 font-normal text-xs gap-2">
               {Array.from(selectedGenres).map(genre => (
@@ -160,6 +165,15 @@ function SignUp() {
           </>
         )}
 
+        {/** create a textarea for a description */}
+        <p className="font-normal justify-start flex text-xs">Dicci qualcosa di te*</p>
+        <textarea
+          className="w-1/2 h-40 rounded-xl bg-gray-700 text-white text-sm p-2 resize-none"
+          placeholder="Descrizione"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+        />
+
         <Button
           type="button"
           text="Registrati"
@@ -183,6 +197,7 @@ function SignUp() {
             Accedi
           </a>
         </p>
+        <p className="text-xs font-normal">Campo opzionale*</p>
       </CenteredContainer>
     </>
   );
