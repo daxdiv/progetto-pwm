@@ -3,7 +3,8 @@ import "./styles/globals.css";
 import { Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
-import Profile from "./components/Profile";
+import PlaylistForm from "./PlaylistForm";
+import Profile from "./Profile";
 import Protected from "./Protected";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
@@ -28,6 +29,14 @@ function App() {
           element={
             <Protected>
               <Profile />
+            </Protected>
+          }
+        />
+        <Route
+          path="/playlist/new"
+          element={
+            <Protected>
+              <PlaylistForm />
             </Protected>
           }
         />
