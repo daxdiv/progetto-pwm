@@ -13,6 +13,7 @@ function Profile() {
   const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const [preferredGenres, setPreferredGenres] = useState<Set<string>>(new Set());
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     const userDataString = localStorage.getItem("user");
@@ -22,21 +23,27 @@ function Profile() {
     }
 
     const userDataJSON = JSON.parse(userDataString);
-    const preferredGenres = userDataJSON.preferredGenres;
+    const { username, email, password, preferredGenres, description } = userDataJSON;
 
     if (!preferredGenres) {
       return;
     }
 
+    usernameRef.current!.value = username;
+    emailRef.current!.value = email;
+    passwordRef.current!.value = password;
     setPreferredGenres(new Set(preferredGenres));
+    setDescription(description);
   }, []);
+
+  console.log(description);
 
   const handleUpdateProfile = async () => {
     const username = usernameRef.current?.value;
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !description) {
       toast.error("Compila tutti i campi");
       return;
     }
@@ -70,6 +77,7 @@ function Profile() {
         email,
         password,
         preferredGenres: Array.from(preferredGenres),
+        description,
       }),
     });
     const data = await response.json();
@@ -163,6 +171,14 @@ function Profile() {
           </>
         )}
 
+        <p className="font-normal justify-start flex text-xs">Dicci qualcosa di te*</p>
+        <textarea
+          className="w-1/2 h-40 rounded-xl bg-gray-700 text-white text-sm p-2 resize-none"
+          placeholder="Descrizione"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+        />
+
         <div className="flex gap-2 mt-2">
           <Button
             type="button"
@@ -178,6 +194,8 @@ function Profile() {
             onClick={handleDeleteProfile}
           />
         </div>
+
+        <p className="text-xs font-normal">Campo opzionale*</p>
       </CenteredContainer>
     </>
   );
