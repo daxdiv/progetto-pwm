@@ -1,6 +1,7 @@
 import express, { type Request, Response } from "express";
 import User from "../models/user";
 import StatusCodes from "http-status-codes";
+import Playlist from "../models/playlist";
 
 import { isValidObjectId } from "mongoose";
 
@@ -65,6 +66,48 @@ router.put("/:id", async (req: Request, res: Response) => {
     }
 
     res.status(StatusCodes.OK).json(updatedUser); //COMMENT: 200
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+  }
+});
+
+router.get("/:id/playlists", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!id) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non fornito" }); //COMMENT: 400
+    return;
+  }
+
+  if (!isValidObjectId(id)) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non valido" }); //COMMENT: 400
+    return;
+  }
+
+  try {
+    const userPlaylists = await Playlist.find({ userId: id });
+
+    if (!userPlaylists) {
+      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
+      return;
+    }
+
+    res.status(StatusCodes.OK).json(
+      userPlaylists.map(p => ({
+        id: p._id,
+        title: p.title,
+        genres: p.genres,
+        tags: p.tags,
+        tracksCount: p.tracks.length,
+        duration: p.tracks.reduce((acc, curr) => acc + curr.duration, 0),
+        isPublic: p.isPublic,
+        createdAt: p.createdAt,
+      }))
+    ); //COMMENT: 200
+
+    return;
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
