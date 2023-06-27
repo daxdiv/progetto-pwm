@@ -36,8 +36,6 @@ function Profile() {
     setDescription(description);
   }, []);
 
-  console.log(description);
-
   const handleUpdateProfile = async () => {
     const username = usernameRef.current?.value;
     const email = emailRef.current?.value;
