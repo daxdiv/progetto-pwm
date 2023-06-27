@@ -1,15 +1,16 @@
 import "react-toggle/style.css";
 
-import Select, { StylesConfig } from "react-select";
 import { useRef, useState } from "react";
 
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
+import Select from "react-select";
 import Toggle from "react-toggle";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
 import { delay } from "./utils/delay";
+import selectStylesConfig from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
 import { useQuery } from "react-query";
 
@@ -32,59 +33,6 @@ type Track = {
   duration: number;
 };
 type Error = { status: number; message: string };
-
-const selectStyles: StylesConfig = {
-  control: provided => ({
-    ...provided,
-    borderWidth: "2px",
-    backgroundColor: "#374151",
-    // borderColor: "#6b7280",
-    borderColor: "#6b7280",
-    outline: "none",
-    color: "#fff",
-    fontSize: "1rem",
-    fontWeight: 400,
-    minHeight: "1.5rem",
-    cursor: "pointer",
-  }),
-  option: provided => ({
-    ...provided,
-    backgroundColor: "#374151",
-    color: "#fff",
-    fontSize: "0.75rem",
-    fontWeight: 400,
-    "&:hover": {
-      backgroundColor: "#4B5563",
-      cursor: "pointer",
-    },
-  }),
-  menu: provided => ({
-    ...provided,
-    backgroundColor: "#059669",
-    color: "#fff",
-    fontSize: "0.75rem",
-    fontWeight: 400,
-  }),
-  singleValue: provided => ({
-    ...provided,
-    backgroundColor: "#6b7280",
-    fontSize: "0.75rem",
-    fontWeight: 400,
-  }),
-  placeholder: provided => ({
-    ...provided,
-    color: "#fff",
-    fontSize: "0.75rem",
-    fontWeight: 400,
-  }),
-  multiValue: provided => ({
-    ...provided,
-    backgroundColor: "#6b7280",
-    color: "red",
-    fontSize: "0.75rem",
-    fontWeight: 400,
-  }),
-};
 
 function NewPlaylist() {
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -199,7 +147,7 @@ function NewPlaylist() {
               }))}
               placeholder="Seleziona le canzoni"
               className="outline-none"
-              styles={selectStyles}
+              styles={selectStylesConfig}
               onChange={selected => {
                 setTracks(() =>
                   selected.map(s => {
