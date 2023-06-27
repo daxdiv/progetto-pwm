@@ -4,12 +4,12 @@ import { useRef, useState } from "react";
 
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
-import { FaTrashAlt } from "react-icons/fa";
 import Input from "./components/ui/Input";
-import Select from "./components/ui/Select";
+import Select from "react-select";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
 import { delay } from "./utils/delay";
+import selectStylesConfig from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
@@ -124,48 +124,23 @@ function SignUp() {
           <>
             <p className="text-xs font-normal">Seleziona i generi musicali preferiti:</p>
             <Select
-              size="sm"
+              isMulti
+              styles={selectStylesConfig}
               placeholder="Seleziona i generi musicali"
               className="text-xs"
-              data={data?.genres || []}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                const genre = e.target.value;
-
-                setSelectedGenres(prevGenres => new Set(prevGenres.add(genre)));
+              options={(data?.genres || []).map(g => ({
+                value: g,
+                label: g.charAt(0).toUpperCase() + g.slice(1),
+              }))}
+              onChange={genres => {
+                setSelectedGenres(
+                  new Set(genres?.map(g => (g as { value: string; label: string }).value))
+                );
               }}
             />
           </>
         )}
 
-        {selectedGenres.size !== 0 && (
-          <>
-            <p className="text-xs font-normal">Generi musicali selezionati:</p>
-
-            <ul className="grid grid-cols-2 font-normal text-xs gap-2">
-              {Array.from(selectedGenres).map(genre => (
-                <li
-                  key={`selected-${genre}`}
-                  className="text-white bg-gray-700 w-full rounded-xl px-2 py-1 flex items-center justify-between gap-1"
-                >
-                  <span>{genre}</span>
-                  <FaTrashAlt
-                    className="text-red-500 font-bold cursor-pointer hover:scale-105 transition-transform"
-                    onClick={() => {
-                      setSelectedGenres(prevGenres => {
-                        const newGenres = new Set(prevGenres);
-                        newGenres.delete(genre);
-
-                        return newGenres;
-                      });
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-
-        {/** create a textarea for a description */}
         <p className="font-normal justify-start flex text-xs">Dicci qualcosa di te*</p>
         <textarea
           className="w-1/2 h-40 rounded-xl bg-gray-700 text-white text-sm p-2 resize-none"
