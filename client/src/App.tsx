@@ -3,7 +3,7 @@ import "./styles/globals.css";
 import { Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
-import PlaylistForm from "./PlaylistForm";
+import NewPlaylist from "./NewPlaylist";
 import Profile from "./Profile";
 import Protected from "./Protected";
 import SignIn from "./SignIn";
@@ -36,7 +36,7 @@ function App() {
           path="/playlist/new"
           element={
             <Protected>
-              <PlaylistForm />
+              <NewPlaylist />
             </Protected>
           }
         />
