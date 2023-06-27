@@ -44,6 +44,9 @@ const playlistSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  genres: {
+    type: [String],
+  },
 });
 
 export default mongoose.model("Playlist", playlistSchema);

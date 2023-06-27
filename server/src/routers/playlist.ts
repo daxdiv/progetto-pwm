@@ -5,7 +5,7 @@ import Playlist from "../models/playlist";
 const router = express.Router();
 
 router.post("/", async (req: Request, res: Response) => {
-  const { userId, title, description, tags, tracks } = req.body;
+  const { userId, title, description, tags, tracks, genres } = req.body;
 
   if (!userId || !title || !description || !tags || !tracks) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: "Dati mancanti" }); //COMMENT: 400
@@ -13,7 +13,14 @@ router.post("/", async (req: Request, res: Response) => {
   }
 
   try {
-    const newPlaylist = new Playlist({ userId, title, description, tags, tracks });
+    const newPlaylist = new Playlist({
+      userId,
+      title,
+      description,
+      tags,
+      tracks,
+      genres,
+    });
     await newPlaylist.save();
 
     res.status(StatusCodes.CREATED).json(newPlaylist); //COMMENT: 201
