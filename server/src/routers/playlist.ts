@@ -33,6 +33,35 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!id) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID playlist non fornito" }); //COMMENT: 400
+    return;
+  }
+
+  if (!isValidObjectId(id)) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID playlist non valido" }); //COMMENT: 400
+    return;
+  }
+
+  try {
+    const playlist = await Playlist.findById(id);
+
+    if (!playlist) {
+      res.status(StatusCodes.NOT_FOUND).json({ message: "Playlist non trovata" }); //COMMENT: 404
+      return;
+    }
+
+    res.status(StatusCodes.OK).json(playlist); //COMMENT: 200
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+  }
+});
+
 router.delete("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
