@@ -33,16 +33,24 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
+router.get("/:id/:userId", async (req: Request, res: Response) => {
+  const { id, userId } = req.params;
 
   if (!id) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: "ID playlist non fornito" }); //COMMENT: 400
     return;
   }
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non fornito" }); //COMMENT: 400
+    return;
+  }
 
   if (!isValidObjectId(id)) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: "ID playlist non valido" }); //COMMENT: 400
+    return;
+  }
+  if (!isValidObjectId(userId)) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non valido" }); //COMMENT: 400
     return;
   }
 
@@ -54,7 +62,18 @@ router.get("/:id", async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(StatusCodes.OK).json(playlist); //COMMENT: 200
+    if (playlist.userId.toString() !== userId) {
+      res.status(StatusCodes.FORBIDDEN).json({ message: "Non autorizzato" }); //COMMENT: 403
+      return;
+    }
+
+    res.status(StatusCodes.OK).json({
+      title: playlist.title,
+      description: playlist.description,
+      tags: playlist.tags,
+      tracks: playlist.tracks,
+      isPublic: playlist.isPublic,
+    }); //COMMENT: 200
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
