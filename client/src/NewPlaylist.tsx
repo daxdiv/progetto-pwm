@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { useQuery } from "react-query";
 
 type Artist = {
+  id: string;
   name: string;
 };
 type TrackResponse = {
@@ -87,6 +88,7 @@ const selectStyles: StylesConfig = {
 
 function NewPlaylist() {
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [playlistGenres, setPlaylistGenres] = useState<Set<string>>(new Set());
   const titleRef = useRef<HTMLInputElement>(null);
   const [description, setDescription] = useState("");
   const tagsRef = useRef<HTMLInputElement>(null);
@@ -149,6 +151,7 @@ function NewPlaylist() {
         tags: tagsArray,
         tracks,
         isPublic,
+        genres: Array.from(playlistGenres),
       }),
     });
     const data = await response.json();
@@ -189,9 +192,9 @@ function NewPlaylist() {
               isMulti
               isSearchable
               options={(data || []).map(t => ({
-                value: `${t.name}$$${t.artists.map(a => a.name).join(", ")}$$${
-                  t.album.release_date
-                }$$${t.duration_ms}`,
+                value: `${t.name}$$${t.artists
+                  .map(a => `${a.name}-${a.id}`)
+                  .join(", ")}$$${t.album.release_date}$$${t.duration_ms}`,
                 label: `${t.name} - ${t.artists.map(a => a.name).join(", ")}`,
               }))}
               placeholder="Seleziona le canzoni"
@@ -202,11 +205,51 @@ function NewPlaylist() {
                   selected.map(s => {
                     const tokens = (s as { value: string }).value.split("$$");
                     const name = tokens[0];
-                    const artists = tokens[1].split(", ");
+                    const artistsData = tokens[1].split(", ");
+                    const artistsNames = artistsData.map(a => a.split("-")[0]);
+                    const artistsIds = artistsData.map(a => a.split("-")[1]);
                     const releaseDate = tokens[2];
                     const duration = parseInt(tokens[3]);
 
-                    return { name, artists, releaseDate, duration } as Track;
+                    Promise.all(
+                      artistsIds.map(async id => {
+                        const response = await fetch(
+                          `${import.meta.env.VITE_SPOTIFY_BASE_URL}/artists/${id}`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${localStorage.getItem(
+                                "access_token"
+                              )}`,
+                            },
+                          }
+                        );
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                          toast.error(data.message);
+                          return;
+                        }
+
+                        return data.genres;
+                      })
+                    ).then(data => {
+                      setPlaylistGenres(() => {
+                        const flattenedData = data.flat();
+
+                        flattenedData.forEach(g => {
+                          playlistGenres.add(g);
+                        });
+
+                        return playlistGenres;
+                      });
+                    });
+
+                    return {
+                      name,
+                      artists: artistsNames,
+                      releaseDate,
+                      duration,
+                    };
                   })
                 );
               }}
