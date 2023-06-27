@@ -32,7 +32,6 @@ type Track = {
   releaseDate: string;
   duration: number;
 };
-type Error = { status: number; message: string };
 
 function NewPlaylist() {
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -41,7 +40,7 @@ function NewPlaylist() {
   const [description, setDescription] = useState("");
   const tagsRef = useRef<HTMLInputElement>(null);
   const [isPublic, setIsPublic] = useState(false);
-  const { data, isLoading, error } = useQuery<TrackResponse[], Error>({
+  const { data, isLoading, error } = useQuery<TrackResponse[], SpotifyApiError>({
     queryKey: ["fetch-tracks"],
     queryFn: async () => {
       await delay();

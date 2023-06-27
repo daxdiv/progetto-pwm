@@ -14,7 +14,6 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 
-type Error = { status: number; message: string };
 type Response = { genres: string[] };
 
 function SignUp() {
@@ -24,7 +23,7 @@ function SignUp() {
   const [selectedGenres, setSelectedGenres] = useState<Set<string>>(new Set());
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery<Response, Error>({
+  const { data, isLoading } = useQuery<Response, SpotifyApiError>({
     queryKey: ["fetch-genres"],
     queryFn: async () => {
       await delay();
