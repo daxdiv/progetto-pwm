@@ -47,6 +47,10 @@ const playlistSchema = new mongoose.Schema({
   genres: {
     type: [String],
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export default mongoose.model("Playlist", playlistSchema);
