@@ -90,7 +90,7 @@ function SignIn() {
 
   return (
     <>
-      <CenteredContainer className="mb-2 flex-col gap-2">
+      <CenteredContainer className="flex-col gap-2">
         {isLoading ? (
           <Triangle
             height="80"

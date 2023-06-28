@@ -7,7 +7,7 @@ function Navbar() {
         to="/"
         className="text-xl"
       >
-        Social Network for Music <span className="text-emerald-600">(SNM)</span>
+        Social Network for Music <span className="text-emerald-600 font-bold">(SNM)</span>
       </Link>
       <ul className="flex gap-4">
         <li>
@@ -24,6 +24,14 @@ function Navbar() {
             className="text-inherit hover:text-emerald-600"
           >
             Crea playlist
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/playlist/browse"
+            className="text-inherit hover:text-emerald-600"
+          >
+            Sfoglia playlist
           </Link>
         </li>
         <li>

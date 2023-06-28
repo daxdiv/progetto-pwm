@@ -112,7 +112,7 @@ function NewPlaylist() {
   };
 
   return (
-    <CenteredContainer className="mb-2 flex-col gap-2">
+    <CenteredContainer className="flex-col gap-2">
       {error && (
         <>
           <p className="text-red-500">{error.message}</p>
