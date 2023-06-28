@@ -2,6 +2,7 @@ import "./styles/globals.css";
 
 import { Route, Routes } from "react-router-dom";
 
+import EditPlaylist from "./EditPlaylist";
 import Navbar from "./components/Navbar";
 import NewPlaylist from "./NewPlaylist";
 import Profile from "./Profile";
@@ -37,6 +38,14 @@ function App() {
           element={
             <Protected>
               <NewPlaylist />
+            </Protected>
+          }
+        />
+        <Route
+          path="/playlist/:id"
+          element={
+            <Protected>
+              <EditPlaylist />
             </Protected>
           }
         />
