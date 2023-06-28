@@ -140,9 +140,9 @@ function SignUp() {
           </>
         )}
 
-        <p className="font-normal justify-start flex text-xs">Dicci qualcosa di te*</p>
+        <p className="font-normal justify-start flex text-xs">Qualcosa di te*</p>
         <textarea
-          className="w-1/2 h-40 rounded-xl bg-gray-700 text-white text-sm p-2 resize-none"
+          className="w-1/2 h-40 rounded-xl bg-gray-800 border-2 border-gray-500 text-white text-sm p-2 resize-none"
           placeholder="Descrizione"
           value={description}
           onChange={e => setDescription(e.target.value)}

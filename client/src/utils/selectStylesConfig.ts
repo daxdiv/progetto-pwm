@@ -4,8 +4,7 @@ const selectStylesConfig: StylesConfig = {
   control: provided => ({
     ...provided,
     borderWidth: "2px",
-    backgroundColor: "#374151",
-    // borderColor: "#6b7280",
+    backgroundColor: "#1f2937",
     borderColor: "#6b7280",
     outline: "none",
     color: "#fff",
@@ -16,7 +15,7 @@ const selectStylesConfig: StylesConfig = {
   }),
   option: provided => ({
     ...provided,
-    backgroundColor: "#374151",
+    backgroundColor: "#1f2937",
     color: "#fff",
     fontSize: "0.75rem",
     fontWeight: 400,

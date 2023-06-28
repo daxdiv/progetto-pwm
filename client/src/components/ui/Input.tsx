@@ -16,7 +16,7 @@ const inputVariants = cva(
         error:
           "border-red-500 bg-red-50 dark:text-red-400 placeholder-red-700 dark:placeholder-red-500 dark:bg-gray-700 dark:border-red-500",
         neutral:
-          "border-gray-300 bg-gray-50 dark:text-white placeholder-gray-700 dark:placeholder-gray-500 dark:bg-gray-700 dark:border-gray-500",
+          "border-gray-300 bg-gray-50 dark:text-white placeholder-gray-700 dark:placeholder-gray-500 dark:bg-gray-800 dark:border-gray-500",
       },
       size: {
         sm: "w-56",

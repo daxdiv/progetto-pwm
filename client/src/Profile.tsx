@@ -209,7 +209,7 @@ function Profile() {
               {Array.from(preferredGenres).map(genre => (
                 <li
                   key={`selected-${genre}`}
-                  className="text-white bg-gray-700 w-full rounded-xl px-2 py-1 flex items-center justify-between gap-1"
+                  className="text-white bg-gray-800 w-full rounded-xl px-2 py-1 flex items-center justify-between gap-1"
                 >
                   <span>{genre}</span>
                   <FaTrashAlt
@@ -229,9 +229,9 @@ function Profile() {
           </>
         )}
 
-        <p className="font-normal justify-start flex text-xs">Dicci qualcosa di te*</p>
+        <p className="font-normal justify-start flex text-xs">Qualcosa di te*</p>
         <textarea
-          className="w-1/2 h-40 rounded-xl bg-gray-700 text-white text-sm p-2 resize-none border-2 border-gray-500"
+          className="w-1/2 h-40 rounded-xl bg-gray-800 text-white text-sm p-2 resize-none border-2 border-gray-500"
           placeholder="Descrizione"
           value={description}
           onChange={e => setDescription(e.target.value)}
