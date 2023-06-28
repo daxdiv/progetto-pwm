@@ -326,7 +326,7 @@ function EditPlaylist() {
             ref={titleRef}
           />
           <textarea
-            className="outline-none focus:border-emerald-600 w-56 h-40 rounded-xl bg-gray-700 text-white text-sm p-2 resize-none border-2 border-gray-500 placeholder:text-gray-500"
+            className="outline-none focus:border-emerald-600 w-56 h-40 rounded-xl bg-gray-800 text-white text-sm p-2 resize-none border-2 border-gray-500 placeholder:text-gray-500"
             placeholder="Descrizione playlist"
             value={description}
             onChange={e => setDescription(e.target.value)}
