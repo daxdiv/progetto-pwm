@@ -89,7 +89,7 @@ function SignUp() {
 
   return (
     <>
-      <CenteredContainer className="mb-2 flex-col gap-2">
+      <CenteredContainer className="flex-col gap-2">
         <Input
           variant="neutral"
           size="sm"
