@@ -2,6 +2,7 @@ import "./styles/globals.css";
 
 import { Route, Routes } from "react-router-dom";
 
+import BrowsePlaylists from "./BrowsePlaylists";
 import EditPlaylist from "./EditPlaylist";
 import Navbar from "./components/Navbar";
 import NewPlaylist from "./NewPlaylist";
@@ -14,7 +15,14 @@ import { Toaster } from "react-hot-toast";
 function App() {
   return (
     <>
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          style: {
+            backgroundColor: "#1f2937",
+            color: "#fff",
+          },
+        }}
+      />
       <Navbar />
       <Routes>
         <Route
@@ -48,6 +56,10 @@ function App() {
               <EditPlaylist />
             </Protected>
           }
+        />
+        <Route
+          path="/playlist/browse"
+          element={<BrowsePlaylists />}
         />
       </Routes>
     </>
