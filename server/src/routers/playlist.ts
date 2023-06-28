@@ -110,4 +110,62 @@ router.delete("/:id", async (req: Request, res: Response) => {
   }
 });
 
+router.put("/:id/:userId", async (req: Request, res: Response) => {
+  const { id, userId } = req.params;
+  const { title, description, tags, tracks, genres, isPublic } = req.body;
+
+  if (!id) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID playlist non fornito" }); //COMMENT: 400
+    return;
+  }
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non fornito" }); //COMMENT: 400
+    return;
+  }
+
+  if (!title && !description && !tags && !tracks && !genres && !isPublic) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "Nessun campo da modificare" }); //COMMENT: 400
+    return;
+  }
+
+  if (!isValidObjectId(id)) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID playlist non valido" }); //COMMENT: 400
+    return;
+  }
+  if (!isValidObjectId(userId)) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non valido" }); //COMMENT: 400
+    return;
+  }
+
+  try {
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        title,
+        description,
+        tags,
+        tracks,
+        genres,
+        isPublic,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!updatedPlaylist) {
+      res.status(StatusCodes.NOT_FOUND).json({ message: "Playlist non trovata" }); //COMMENT: 404
+      return;
+    }
+
+    res.status(StatusCodes.OK).json(updatedPlaylist); //COMMENT: 200
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+  }
+});
+
 export default router;
