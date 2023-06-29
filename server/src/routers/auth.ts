@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import fetch from "node-fetch";
 import User from "../models/user";
 import StatusCode from "http-status-codes";
+import capitalize from "../utils/capitalize";
 
 dotenv.config();
 
@@ -66,19 +67,25 @@ router.post("/sign-up", async (req: Request, res: Response) => {
     return;
   }
 
-  const user = new User({ username, email, password, preferredGenres, description });
-
   try {
-    const duplicate = await User.findOne({ username });
-
-    if (duplicate) {
-      res.status(StatusCode.BAD_REQUEST).json({ message: "Username già usato" }); //COMMENT: 400
-      return;
-    }
+    const user = new User({
+      username,
+      email: email.toLowerCase(),
+      password: password.toLowerCase(),
+      preferredGenres,
+      description,
+    });
 
     await user.save();
     res.status(StatusCode.CREATED).json(user); //COMMENT: 201
   } catch (error) {
+    if (error.code === 11000) {
+      res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ message: `${capitalize(Object.keys(error.keyValue)[0])} già esistente` }); //COMMENT: 400
+      return;
+    }
+
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: error.message }); //COMMENT: 500
   }
 });
