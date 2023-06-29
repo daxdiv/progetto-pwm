@@ -74,17 +74,21 @@ function NewPlaylist() {
       return;
     }
 
+    if (!titleRef.current || !tagsRef.current) {
+      return;
+    }
+
     const userDataJSON = JSON.parse(userDataString);
     const { _id: userId } = userDataJSON;
-    const title = titleRef.current?.value;
-    const tags = tagsRef.current?.value;
+    const title = titleRef.current.value;
+    const tags = tagsRef.current.value;
 
-    if (!title || !description || !tracks || !tags) {
+    if (!title || !description || !tracks.length || !tags) {
       toast.error("Compila tutti i campi");
       return;
     }
 
-    const tagsArray = tags.replace(" ", "").split(",");
+    const tagsArray = tags.split(" ");
 
     const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/playlist`, {
       method: "POST",
@@ -109,6 +113,11 @@ function NewPlaylist() {
     }
 
     toast.success("Playlist creata con successo");
+    titleRef.current.value = "";
+    setDescription("");
+    tagsRef.current.value = "";
+    setIsPublic(false);
+    setTracks([]);
   };
 
   return (
@@ -217,7 +226,7 @@ function NewPlaylist() {
           />
 
           <p className="font-normal justify-start flex text-xs">
-            Inserisci uno o più tag descrittivi, separati da virgola
+            Inserisci uno o più tag descrittivi, separati da spazi
           </p>
           <Input
             variant="neutral"
