@@ -133,7 +133,7 @@ function EditPlaylist() {
 
     const userDataJSON = JSON.parse(userDataString);
     const title = titleRef.current?.value;
-    const tags = tagsRef.current?.value.split(",").map(t => t.trim());
+    const tags = tagsRef.current?.value.split(" ").map(t => t.trim());
 
     if (!title || !tags || (!tracks && !oldTracks)) {
       toast.error("Compila tutti i campi");
@@ -333,7 +333,7 @@ function EditPlaylist() {
           />
 
           <p className="font-normal justify-start flex text-xs">
-            Inserisci uno o più tag descrittivi, separati da virgola
+            Inserisci uno o più tag descrittivi, separati da spazi
           </p>
           <Input
             variant="neutral"
