@@ -83,9 +83,13 @@ function Profile() {
       return;
     }
 
-    usernameRef.current!.value = username;
-    emailRef.current!.value = email;
-    passwordRef.current!.value = password;
+    if (!usernameRef.current || !emailRef.current || !passwordRef.current) {
+      return;
+    }
+
+    usernameRef.current.value = username;
+    emailRef.current.value = email;
+    passwordRef.current.value = password;
     setPreferredGenres(new Set(preferredGenres));
     setDescription(description);
   }, []);
@@ -172,10 +176,7 @@ function Profile() {
 
   return (
     <>
-      <CenteredContainer
-        className="pt-20 flex-col gap-2"
-        minHeight="parent"
-      >
+      <CenteredContainer className="pt-20 flex-col gap-2">
         <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-4">
           Il tuo Profilo
         </h1>
@@ -260,7 +261,7 @@ function Profile() {
         </h1>
 
         {isLoading && (
-          <div className="flex justify-center items-center h-32">
+          <div className="flex justify-center items-center">
             <Triangle
               height="40"
               width="40"
@@ -268,6 +269,20 @@ function Profile() {
               ariaLabel="triangle-loading"
               visible={true}
             />
+          </div>
+        )}
+
+        {error && (
+          <div className="flex justify-center items-center">
+            <p className="text-red-500 text-lg">{error.message}</p>
+          </div>
+        )}
+
+        {playlists && playlists.length === 0 && (
+          <div className="flex justify-center items-center">
+            <p className="text-gray-500 text-md font-normal">
+              Non hai ancora creato nessuna playlist
+            </p>
           </div>
         )}
 
