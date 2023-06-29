@@ -112,7 +112,7 @@ function EditPlaylist() {
 
       titleRef.current.value = title;
       setDescription(description);
-      tagsRef.current.value = tags.join(", ");
+      tagsRef.current.value = tags.join(" ");
       setIsPublic(isPublic);
       setOldTracks(
         tracks.map((t: Track) => ({
@@ -203,6 +203,12 @@ function EditPlaylist() {
             Torna alla home
           </a>
         </>
+      )}
+
+      {!error && (
+        <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-4">
+          Modifica playlist
+        </h1>
       )}
 
       {oldTracks.length > 0 && (

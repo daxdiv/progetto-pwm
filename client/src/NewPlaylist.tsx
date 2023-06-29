@@ -133,6 +133,13 @@ function NewPlaylist() {
           </a>
         </>
       )}
+
+      {!error && (
+        <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-4">
+          Crea una nuova playlist
+        </h1>
+      )}
+
       {!error && (
         <>
           {isLoading ? (

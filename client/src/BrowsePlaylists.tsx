@@ -1,3 +1,4 @@
+import { AiFillInfoCircle } from "react-icons/ai";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import { FaFileImport } from "react-icons/fa";
 import { Triangle } from "react-loader-spinner";
@@ -28,7 +29,9 @@ function BrowsePlaylists() {
       const userDataString = localStorage.getItem("user");
 
       if (!userDataString) {
-        toast.error("Utente non trovato");
+        toast(<p>Accedi per salvare una playlist</p>, {
+          icon: <AiFillInfoCircle className="text-yellow-400 text-xl" />,
+        });
         return;
       }
 
@@ -58,7 +61,7 @@ function BrowsePlaylists() {
     const userDataString = localStorage.getItem("user");
 
     if (!userDataString) {
-      toast.error("Utente non trovato");
+      toast.error("Devi aver fatto l'accesso per salvare una playlist");
       return;
     }
 
@@ -96,6 +99,12 @@ function BrowsePlaylists() {
   return (
     <>
       <CenteredContainer className="flex-col gap-2">
+        {!error && !isLoading && (
+          <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-4">
+            Sfoglia playlist pubbliche
+          </h1>
+        )}
+
         {isLoading && (
           <Triangle
             height="80"
