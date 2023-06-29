@@ -51,6 +51,6 @@ const playlistSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+}).index({ userId: 1, title: 1 }, { unique: true });
 
 export default mongoose.model("Playlist", playlistSchema);
