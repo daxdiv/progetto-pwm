@@ -24,7 +24,7 @@ const playlistSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      artist: [
+      artists: [
         {
           type: String,
           required: true,

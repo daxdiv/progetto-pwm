@@ -40,7 +40,7 @@ router.get("/:userId", async (req: Request, res: Response) => {
         tags: p.tags,
         tracks: p.tracks.map(t => ({
           name: t.name,
-          artist: t.artist,
+          artists: t.artists,
           duration: t.duration,
         })),
         tracksCount: p.tracks.length,
