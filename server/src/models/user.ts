@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   description: String,
+  savedPlaylists: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Playlist",
+    default: [],
+  },
 });
 
 export default mongoose.model("User", userSchema);
