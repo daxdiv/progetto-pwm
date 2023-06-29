@@ -10,7 +10,7 @@ import Select from "react-select";
 import Toggle from "react-toggle";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
-import { delay } from "./utils/delay";
+import { delay } from "./utils/helpers";
 import selectStylesConfig from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
 import { useQuery } from "react-query";

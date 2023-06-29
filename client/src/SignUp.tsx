@@ -8,7 +8,7 @@ import Input from "./components/ui/Input";
 import Select from "react-select";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
-import { delay } from "./utils/delay";
+import { delay } from "./utils/helpers";
 import selectStylesConfig from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -121,7 +121,7 @@ function SignUp() {
           />
         ) : (
           <>
-            <p className="text-xs font-normal">Seleziona i generi musicali preferiti:</p>
+            <p className="text-xs font-normal">Seleziona i generi musicali preferiti:*</p>
             <Select
               isMulti
               styles={selectStylesConfig}
