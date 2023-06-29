@@ -38,9 +38,15 @@ router.get("/:userId", async (req: Request, res: Response) => {
         title: p.title,
         description: p.description,
         tags: p.tags,
+        tracks: p.tracks.map(t => ({
+          name: t.name,
+          artist: t.artist,
+          duration: t.duration,
+        })),
         tracksCount: p.tracks.length,
         genres: p.genres,
         createdAt: p.createdAt,
+        duration: p.tracks.reduce((acc, curr) => acc + curr.duration, 0),
       }))
     ); //COMMENT: 200
   } catch (error) {
