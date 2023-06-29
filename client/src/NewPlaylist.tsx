@@ -1,5 +1,6 @@
 import "react-toggle/style.css";
 
+import { delay, truncate } from "./utils/helpers";
 import { useRef, useState } from "react";
 
 import Button from "./components/ui/Button";
@@ -9,7 +10,6 @@ import Select from "react-select";
 import Toggle from "react-toggle";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
-import { delay } from "./utils/delay";
 import selectStylesConfig from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
 import { useQuery } from "react-query";
@@ -158,7 +158,10 @@ function NewPlaylist() {
                 value: `${t.name}$$${t.artists
                   .map(a => `${a.name}-${a.id}`)
                   .join(", ")}$$${t.album.release_date}$$${t.duration_ms}`,
-                label: `${t.name} - ${t.artists.map(a => a.name).join(", ")}`,
+                label: truncate(
+                  `${t.name} - ${t.artists.map(a => a.name).join(", ")}`,
+                  50
+                ),
               }))}
               placeholder="Seleziona le canzoni"
               className="outline-none"

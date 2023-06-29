@@ -7,7 +7,7 @@ import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
 import { Triangle } from "react-loader-spinner";
-import { delay } from "./utils/delay";
+import { delay } from "./utils/helpers";
 import { toast } from "react-hot-toast";
 import { useQuery } from "react-query";
 

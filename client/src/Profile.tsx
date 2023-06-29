@@ -1,3 +1,4 @@
+import { delay, formatDate } from "./utils/helpers";
 import { useEffect, useRef, useState } from "react";
 
 import { BiSolidLock } from "react-icons/bi";
@@ -6,8 +7,6 @@ import CenteredContainer from "./components/ui/CenteredContainer";
 import { FaTrashAlt } from "react-icons/fa";
 import Input from "./components/ui/Input";
 import { Triangle } from "react-loader-spinner";
-import { delay } from "./utils/delay";
-import { formatDate } from "./utils/formatDate";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
@@ -204,7 +203,7 @@ function Profile() {
 
         {preferredGenres.size !== 0 && (
           <>
-            <p className="text-sm font-normal">Modifica generi musicali preferiti:</p>
+            <p className="text-sm font-normal">Modifica generi musicali preferiti:*</p>
 
             <ul className="grid grid-cols-2 font-normal text-xs gap-2">
               {Array.from(preferredGenres).map(genre => (
