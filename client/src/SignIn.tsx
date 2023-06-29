@@ -78,10 +78,15 @@ function SignIn() {
     navigate("/profile");
   };
 
-  // TODO: risolvere doppio render
   useEffect(() => {
-    if (searchParams.get("success")) toast.success(searchParams.get("success"));
-    if (searchParams.get("error")) toast.error(searchParams.get("error"));
+    if (searchParams.get("success")) {
+      toast.success(searchParams.get("success"));
+      searchParams.delete("success");
+    }
+    if (searchParams.get("error")) {
+      toast.error(searchParams.get("error"));
+      searchParams.delete("error");
+    }
   }, [searchParams]);
 
   if (!serverError && data) {
