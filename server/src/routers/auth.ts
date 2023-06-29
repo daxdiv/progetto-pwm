@@ -12,38 +12,49 @@ const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const url = "https://accounts.spotify.com/api/token";
 
-router.get("/access-token", (_req: Request, res: Response) => {
+router.get("/access-token", async (_req: Request, res: Response) => {
   if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET) {
-    res.status(500).send("CLIENT_ID o CLIENT_SECRET mancanti");
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .send("CLIENT_ID o CLIENT_SECRET mancanti"); // COMMENT: 500
     return;
   }
 
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: `Basic ${btoa(SPOTIFY_CLIENT_ID + ":" + SPOTIFY_CLIENT_SECRET)}`,
-    },
-    body: new URLSearchParams({
-      grant_type: "client_credentials",
-    }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      res.status(StatusCode.OK).send(data); //COMMENT: 200
-    })
-    .catch(() => {
-      res
-        .status(StatusCode.INTERNAL_SERVER_ERROR)
-        .send({ message: "Errore lato server, riprovare più tardi" }); //COMMENT: 500
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${btoa(SPOTIFY_CLIENT_ID + ":" + SPOTIFY_CLIENT_SECRET)}`,
+      },
+      body: new URLSearchParams({
+        grant_type: "client_credentials",
+      }),
     });
+    const data = await response.json();
+
+    res.status(StatusCode.OK).send(data); //COMMENT: 200
+  } catch (error) {
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .send({ message: "Errore lato server, riprovare più tardi" }); //COMMENT: 500
+  }
 });
 
 router.post("/sign-in", async (req: Request, res: Response) => {
   const { email, password } = req.body;
+  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+  if (!emailRegex.test(email)) {
+    res.status(StatusCode.BAD_REQUEST).json({ message: "Email non valida" }); //COMMENT: 400
+    return;
+  }
 
   try {
-    const user = await User.findOne({ email, password });
+    const user = await User.findOne({
+      email: email.toLowerCase(),
+      password: password.toLowerCase(),
+    });
 
     if (!user) {
       res
@@ -77,6 +88,7 @@ router.post("/sign-up", async (req: Request, res: Response) => {
     });
 
     await user.save();
+
     res.status(StatusCode.CREATED).json(user); //COMMENT: 201
   } catch (error) {
     if (error.code === 11000) {

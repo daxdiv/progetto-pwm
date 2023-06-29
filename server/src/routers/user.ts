@@ -4,6 +4,7 @@ import StatusCodes from "http-status-codes";
 import Playlist from "../models/playlist";
 
 import { isValidObjectId } from "mongoose";
+import { checkIds } from "../middlewares";
 
 const router = express.Router();
 
@@ -35,18 +36,9 @@ router.delete("/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.put("/:id", async (req: Request, res: Response) => {
+router.put("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
   const { username, email, password, preferredGenres, description } = req.body;
-
-  if (!id) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non fornito" }); //COMMENT: 400
-    return;
-  }
-  if (!isValidObjectId(id)) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non valido" }); //COMMENT: 400
-    return;
-  }
 
   if (!username && !email && !password && !preferredGenres && !description) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: "Nessun campo da modificare" }); //COMMENT: 400
@@ -73,24 +65,16 @@ router.put("/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/:id/playlists", async (req: Request, res: Response) => {
+router.get("/:id/playlists", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
-
-  if (!id) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non fornito" }); //COMMENT: 400
-    return;
-  }
-
-  if (!isValidObjectId(id)) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non valido" }); //COMMENT: 400
-    return;
-  }
 
   try {
     const userPlaylists = await Playlist.find({ userId: id });
 
     if (!userPlaylists) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "Nessuna playlist trovata per questo utente" }); //COMMENT: 404
       return;
     }
 
