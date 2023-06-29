@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../utils/cn";
 
 interface Props
-  extends React.HTMLAttributes<HTMLInputElement>,
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
     VariantProps<typeof inputVariants> {}
 
 const inputVariants = cva(
@@ -22,11 +22,6 @@ const inputVariants = cva(
         sm: "w-56",
         md: "w-96",
         lg: "w-3/5",
-      },
-      type: {
-        text: "text",
-        password: "password",
-        email: "email",
       },
     },
     defaultVariants: {
