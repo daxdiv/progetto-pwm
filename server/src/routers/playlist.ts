@@ -2,13 +2,59 @@ import express, { type Request, Response } from "express";
 import StatusCodes from "http-status-codes";
 import Playlist from "../models/playlist";
 import { isValidObjectId } from "mongoose";
+import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
-router.post("/", async (req: Request, res: Response) => {
-  const { userId, title, description, tags, tracks, genres } = req.body;
+router.get("/:userId", async (req: Request, res: Response) => {
+  const { userId } = req.params;
 
-  if (!userId || !title || !description || !tags || !tracks) {
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non fornito" }); //COMMENT: 400
+    return;
+  }
+
+  if (!isValidObjectId(userId)) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non valido" }); //COMMENT: 400
+    return;
+  }
+
+  try {
+    const playlists = await Playlist.find({
+      userId: { $ne: new ObjectId(userId) },
+      isPublic: true,
+    }).sort({
+      createdAt: -1,
+    });
+
+    if (!playlists) {
+      res.status(StatusCodes.NOT_FOUND).json({ message: "Nessuna playlist trovata" }); //COMMENT: 404
+      return;
+    }
+
+    res.status(StatusCodes.OK).json(
+      playlists.map(p => ({
+        id: p._id,
+        title: p.title,
+        description: p.description,
+        tags: p.tags,
+        tracksCount: p.tracks.length,
+        genres: p.genres,
+        createdAt: p.createdAt,
+      }))
+    ); //COMMENT: 200
+  } catch (error) {
+    console.error(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+  }
+});
+
+router.post("/", async (req: Request, res: Response) => {
+  const { userId, title, description, tags, tracks, genres, isPublic } = req.body;
+
+  if (!userId || !title || !description || !tags || !tracks || !genres) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: "Dati mancanti" }); //COMMENT: 400
     return;
   }
@@ -21,6 +67,7 @@ router.post("/", async (req: Request, res: Response) => {
       tags,
       tracks,
       genres,
+      isPublic,
     });
     await newPlaylist.save();
 
