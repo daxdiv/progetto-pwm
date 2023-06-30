@@ -82,12 +82,16 @@ router.get("/:id/playlists", checkIds, async (req: Request, res: Response) => {
       userPlaylists.map(p => ({
         id: p._id,
         title: p.title,
-        genres: p.genres,
         tags: p.tags,
-        tracksCount: p.tracks.length,
+        tracks: p.tracks.map(t => ({
+          name: t.name,
+          artists: t.artists,
+          duration: t.duration,
+        })),
+        genres: p.genres,
+        createdAt: p.createdAt,
         duration: p.tracks.reduce((acc, curr) => acc + curr.duration, 0),
         isPublic: p.isPublic,
-        createdAt: p.createdAt,
       }))
     ); //COMMENT: 200
 
