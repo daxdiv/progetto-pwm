@@ -7,7 +7,7 @@ const selectStylesConfig: StylesConfig = {
     backgroundColor: "#1f2937",
     borderWidth: "2px",
     borderColor: "#6b7280",
-    color: "#fff",
+    color: "#ffffff",
     cursor: "pointer",
     "&:hover": {
       borderColor: "#059669",
@@ -16,7 +16,7 @@ const selectStylesConfig: StylesConfig = {
   option: provided => ({
     ...provided,
     backgroundColor: "#1f2937",
-    color: "#fff",
+    color: "#ffffff",
     fontSize: "0.75rem",
     "&:hover": {
       backgroundColor: "#4B5563",
@@ -26,12 +26,12 @@ const selectStylesConfig: StylesConfig = {
   menu: provided => ({
     ...provided,
     backgroundColor: "#1f2937",
-    color: "#fff",
+    color: "#ffffff",
     fontSize: "0.75rem",
   }),
   singleValue: provided => ({
     ...provided,
-    color: "#fff",
+    color: "#ffffff",
     fontSize: "0.75rem",
   }),
 };
@@ -40,8 +40,14 @@ const multiSelectStylesConfig: StylesConfig = {
   ...selectStylesConfig,
   multiValue: provided => ({
     ...provided,
-    backgroundColor: "#6b7280",
-    color: "red",
+    backgroundColor: "#374151",
+    color: "#ff0000",
+    fontSize: "0.75rem",
+    fontWeight: 400,
+  }),
+  multiValueLabel: provided => ({
+    ...provided,
+    color: "#ffffff",
     fontSize: "0.75rem",
     fontWeight: 400,
   }),
