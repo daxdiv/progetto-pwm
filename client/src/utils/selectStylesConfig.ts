@@ -3,22 +3,21 @@ import { type StylesConfig } from "react-select";
 const selectStylesConfig: StylesConfig = {
   control: provided => ({
     ...provided,
-    borderWidth: "2px",
-    backgroundColor: "#1f2937",
-    borderColor: "#6b7280",
     outline: "none",
+    backgroundColor: "#1f2937",
+    borderWidth: "2px",
+    borderColor: "#6b7280",
     color: "#fff",
-    fontSize: "1rem",
-    fontWeight: 400,
-    minHeight: "1.5rem",
     cursor: "pointer",
+    "&:hover": {
+      borderColor: "#059669",
+    },
   }),
   option: provided => ({
     ...provided,
     backgroundColor: "#1f2937",
     color: "#fff",
     fontSize: "0.75rem",
-    fontWeight: 400,
     "&:hover": {
       backgroundColor: "#4B5563",
       cursor: "pointer",
@@ -26,23 +25,19 @@ const selectStylesConfig: StylesConfig = {
   }),
   menu: provided => ({
     ...provided,
-    backgroundColor: "#059669",
+    backgroundColor: "#1f2937",
     color: "#fff",
     fontSize: "0.75rem",
-    fontWeight: 400,
   }),
   singleValue: provided => ({
     ...provided,
-    backgroundColor: "#6b7280",
-    fontSize: "0.75rem",
-    fontWeight: 400,
-  }),
-  placeholder: provided => ({
-    ...provided,
     color: "#fff",
     fontSize: "0.75rem",
-    fontWeight: 400,
   }),
+};
+
+const multiSelectStylesConfig: StylesConfig = {
+  ...selectStylesConfig,
   multiValue: provided => ({
     ...provided,
     backgroundColor: "#6b7280",
@@ -52,4 +47,4 @@ const selectStylesConfig: StylesConfig = {
   }),
 };
 
-export default selectStylesConfig;
+export { selectStylesConfig, multiSelectStylesConfig };
