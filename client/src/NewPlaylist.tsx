@@ -1,6 +1,5 @@
 import "react-toggle/style.css";
 
-import { delay, truncate } from "./utils/helpers";
 import { useRef, useState } from "react";
 
 import Button from "./components/ui/Button";
@@ -12,20 +11,9 @@ import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
 import { selectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
-import { useQuery } from "react-query";
+import { truncate } from "./utils/helpers";
+import useTracks from "./hooks/useTracks";
 
-type Artist = {
-  id: string;
-  name: string;
-};
-type TrackResponse = {
-  name: string;
-  artists: Artist[];
-  album: {
-    release_date: string;
-  };
-  duration_ms: number;
-};
 type Track = {
   name: string;
   artists: string[];
@@ -40,32 +28,7 @@ function NewPlaylist() {
   const [description, setDescription] = useState("");
   const tagsRef = useRef<HTMLInputElement>(null);
   const [isPublic, setIsPublic] = useState(false);
-  const { data, isLoading, error } = useQuery<TrackResponse[], SpotifyApiError>({
-    queryKey: ["fetch-tracks"],
-    queryFn: async () => {
-      await delay();
-
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_SPOTIFY_BASE_URL
-        }/search?q=track&type=track&market=IT&limit=50&offset=0`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
-      );
-      const data = await response.json();
-
-      return data.tracks.items;
-    },
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-    onError: error => {
-      toast.error(error.message);
-    },
-  });
+  const { fetchedTracks, isLoading, isRefetching, error } = useTracks();
 
   const handleCreatePlaylist = async () => {
     const userDataString = localStorage.getItem("user");
@@ -142,7 +105,7 @@ function NewPlaylist() {
 
       {!error && (
         <>
-          {isLoading ? (
+          {isLoading || isRefetching ? (
             <Triangle
               height="40"
               width="40"
@@ -154,7 +117,7 @@ function NewPlaylist() {
             <Select
               isMulti
               isSearchable
-              options={(data || []).map(t => ({
+              options={(fetchedTracks || []).map(t => ({
                 value: `${t.name}$$${t.artists
                   .map(a => `${a.name}-${a.id}`)
                   .join(", ")}$$${t.album.release_date}$$${t.duration_ms}`,
