@@ -1,8 +1,6 @@
-import { formatDate, formatDuration } from "./utils/helpers";
-
 import CenteredContainer from "./components/ui/CenteredContainer";
-import { FaFileImport } from "react-icons/fa";
 import Input from "./components/ui/Input";
+import PlaylistCard from "./components/PlaylistCard";
 import Select from "react-select";
 import Toggle from "react-toggle";
 import { Triangle } from "react-loader-spinner";
@@ -19,41 +17,7 @@ function BrowsePlaylists() {
   const [searchValue, setSearchValue] = useState("");
   const { playlists, isLoading, error, isRefetching } = usePublicPlaylists();
 
-  const handleSavePlaylist = async (playlistId: string) => {
-    const userDataString = localStorage.getItem("user");
-
-    if (!userDataString) {
-      toast.error("Devi aver fatto l'accesso per salvare una playlist");
-      return;
-    }
-
-    const userDataJSON = JSON.parse(userDataString);
-    const userId = userDataJSON._id;
-
-    const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/user/save-playlist`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          playlistId,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      toast.error(data.message);
-      return;
-    }
-
-    toast.success(data.message);
-  };
-  const handleFilterCrieriaChange = (e: { value: FilterCriteria; label: string }) => {
+  const handleFilterCriteriaChange = (e: { value: FilterCriteria; label: string }) => {
     if (!e) return;
 
     setFilterCriteria(e.value);
@@ -138,7 +102,7 @@ function BrowsePlaylists() {
                   { value: "artist", label: "Cantante" },
                 ]}
                 onChange={e => {
-                  handleFilterCrieriaChange(
+                  handleFilterCriteriaChange(
                     e as { value: FilterCriteria; label: string }
                   );
                 }}
@@ -194,90 +158,12 @@ function BrowsePlaylists() {
               }
             })
             .map(p => (
-              <div
-                className="relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800 w-1/2"
+              <PlaylistCard
                 key={p.id}
-              >
-                <div className="flex gap-2">
-                  <p className="text-md text-emerald-600 flex justify-center items-center">
-                    Titolo: <span className="text-white">{p.title}</span>
-                  </p>
-                </div>
-
-                <div className="absolute top-2 right-2 flex flex-row gap-2">
-                  <FaFileImport
-                    className="text-emerald-600 cursor-pointer active:text-emerald-500 hover:text-emerald-500"
-                    alt="Salva playlist"
-                    onClick={() => handleSavePlaylist(p.id)}
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <p className="text-md text-emerald-600">
-                    Numero di tracce: <span className="text-white">{p.tracksCount}</span>
-                  </p>
-                </div>
-                <div className="flex flex-row gap-2 mt-1 font-normal">
-                  {p.genres.slice(0, 5).map((genre, index) => (
-                    <span
-                      key={`${genre}-${index}`}
-                      className="text-xs text-white bg-gray-700 rounded-md px-2 py-1"
-                    >
-                      {genre}
-                    </span>
-                  ))}
-
-                  {p.genres.length - 5 >= 1 && (
-                    <span className="flex justify-center items-center text-xs text-gray-500">
-                      +{p.genres.length - 5} altri
-                    </span>
-                  )}
-                </div>
-                <div className="flex flex-row gap-2 mt-2 font-normal">
-                  {p.tags.slice(0, 5).map((tag, index) => (
-                    <span
-                      key={`${tag}-${index}`}
-                      className="text-sm text-white bg-gray-700 rounded-md px-2 py-1"
-                    >
-                      <span className="text-emerald-600">#</span>
-                      {tag}
-                    </span>
-                  ))}
-
-                  {p.tags.length - 5 >= 1 && (
-                    <span className="flex justify-center items-center text-xs text-gray-500">
-                      +{p.tags.length - 5} altri
-                    </span>
-                  )}
-                </div>
-
-                <div className="mt-3">
-                  <div>
-                    <ul className="font-normal text-[.6rem]">
-                      {p.tracks.map((track, index) => (
-                        <li
-                          key={`${track.name}-${index}`}
-                          className="py-1"
-                        >
-                          {index + 1}. {track.name} --{" "}
-                          <span className="text-emerald-600">
-                            {formatDuration(track.duration)}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="text-xs text-gray-500 mt-2">
-                  Durata totale:{" "}
-                  <span className="text-emerald-600">{formatDuration(p.duration)}</span>
-                </div>
-
-                <div className="absolute bottom-1 right-1 flex flex-row gap-2 text-xs text-gray-500">
-                  Creata il: {formatDate(new Date(p.createdAt))}
-                </div>
-              </div>
+                playlist={p}
+                saveable
+                extended
+              />
             ))}
       </CenteredContainer>
     </>

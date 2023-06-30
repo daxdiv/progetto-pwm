@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { BiSolidLock } from "react-icons/bi";
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import { FaTrashAlt } from "react-icons/fa";
 import Input from "./components/ui/Input";
+import PlaylistCard from "./components/PlaylistCard";
 import { Triangle } from "react-loader-spinner";
-import { formatDate } from "./utils/helpers";
 import { toast } from "react-hot-toast";
 import useAuth from "./hooks/useAuth";
 import useUserPlaylists from "./hooks/useUserPlaylists";
@@ -226,72 +225,10 @@ function Profile() {
           !isLoading &&
           !isRefetching &&
           playlists?.map(p => (
-            <>
-              <div
-                className="relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800 w-1/2 cursor-pointer hover:scale-[1.015] transition-transform"
-                key={p.id}
-                onClick={() => navigate(`/playlist/${p.id}`)}
-              >
-                {!p.isPublic && (
-                  <div className="absolute top-1 right-1 flex flex-row gap-2">
-                    <BiSolidLock
-                      className="text-emerald-600"
-                      alt="Playlist privata"
-                    />
-                  </div>
-                )}
-                <div className="flex gap-2">
-                  <p className="text-md text-emerald-600 flex justify-center items-center">
-                    Titolo: <span className="text-white">{p.title}</span>
-                  </p>
-                </div>
-
-                <div className="flex gap-2">
-                  <p className="text-md text-emerald-600">
-                    Numero di tracce: <span className="text-white">{p.tracksCount}</span>
-                  </p>
-                </div>
-
-                <div className="flex flex-row gap-2 mt-1 font-normal">
-                  {p.genres.slice(0, 5).map((genre, index) => (
-                    <span
-                      key={`${genre}-${index}`}
-                      className="text-xs text-white bg-gray-700 rounded-md px-2 py-1"
-                    >
-                      {genre}
-                    </span>
-                  ))}
-
-                  {p.genres.length - 5 >= 1 && (
-                    <span className="flex justify-center items-center text-xs text-gray-500">
-                      +{p.genres.length - 5} altri
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-row gap-2 mt-2 font-normal">
-                  {p.tags.slice(0, 5).map((tag, index) => (
-                    <span
-                      key={`${tag}-${index}`}
-                      className="text-sm text-white bg-gray-700 rounded-md px-2 py-1"
-                    >
-                      <span className="text-emerald-600">#</span>
-                      {tag}
-                    </span>
-                  ))}
-
-                  {p.tags.length - 5 >= 1 && (
-                    <span className="flex justify-center items-center text-xs text-gray-500">
-                      +{p.tags.length - 5} altri
-                    </span>
-                  )}
-                </div>
-
-                <div className="absolute bottom-1 right-1 flex flex-row gap-2 text-xs text-gray-500">
-                  Creata il: {formatDate(new Date(p.createdAt))}
-                </div>
-              </div>
-            </>
+            <PlaylistCard
+              playlist={p}
+              owned
+            />
           ))}
       </CenteredContainer>
     </>
