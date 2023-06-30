@@ -53,13 +53,19 @@ router.post("/sign-in", async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({
       email: email.toLowerCase(),
-      password: password.toLowerCase(),
     });
 
     if (!user) {
       res
         .status(StatusCode.NOT_FOUND)
-        .json({ error: "Nessun utente trovato con queste credenziali" }); //COMMENT: 404
+        .json({ error: "Nessun utente trovato con questa email" }); //COMMENT: 404
+      return;
+    }
+
+    const passwordMatch = await user.comparePassword(password);
+
+    if (!passwordMatch) {
+      res.status(StatusCode.UNAUTHORIZED).json({ error: "Password errata" }); //COMMENT: 401
       return;
     }
 

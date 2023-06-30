@@ -1,6 +1,17 @@
+import bcrpyt from "bcrypt";
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
+type User = {
+  username: string;
+  email: string;
+  password: string;
+  preferredGenres: string[];
+  description: string;
+  savedPlaylists: mongoose.Schema.Types.ObjectId[];
+  comparePassword: (password: string) => Promise<boolean>;
+};
+
+const userSchema = new mongoose.Schema<User>({
   username: {
     type: String,
     required: true,
@@ -26,5 +37,23 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
 });
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  try {
+    const salt = await bcrpyt.genSalt(10);
+    const hashedPassword = await bcrpyt.hash(this.password, salt);
+
+    this.password = hashedPassword;
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+userSchema.methods.comparePassword = async function (password: string) {
+  return await bcrpyt.compare(password, this.password);
+};
 
 export default mongoose.model("User", userSchema);
