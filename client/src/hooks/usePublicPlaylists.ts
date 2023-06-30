@@ -1,5 +1,6 @@
 import { delay } from "../utils/helpers";
 import { toast } from "react-hot-toast";
+import useAuth from "./useAuth";
 import { useQuery } from "react-query";
 
 type Track = {
@@ -20,6 +21,7 @@ type Playlist = {
 };
 
 export default function usePublicPlaylists() {
+  const auth = useAuth();
   const {
     data: playlists,
     isLoading,
@@ -28,15 +30,12 @@ export default function usePublicPlaylists() {
   } = useQuery<Playlist[], Error>({
     queryKey: "fetch-public-playlists",
     queryFn: async () => {
-      const userDataString = localStorage.getItem("user");
-
-      if (!userDataString) {
+      if (!auth) {
         toast.error("Accedi per salvare una playlist");
         return;
       }
 
-      const userDataJSON = JSON.parse(userDataString);
-      const userId = userDataJSON._id;
+      const { _id: userId } = auth;
 
       await delay();
 

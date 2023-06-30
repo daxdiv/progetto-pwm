@@ -2,12 +2,17 @@ import { delay } from "../utils/helpers";
 import { toast } from "react-hot-toast";
 import { useQuery } from "react-query";
 
+type Track = {
+  name: string;
+  artists: string[];
+  duration: number;
+};
 type Playlist = {
   id: string;
   title: string;
   genres: string[];
   tags: string[];
-  tracksCount: number;
+  tracks: Track[];
   duration: number;
   isPublic: boolean;
   createdAt: string;
@@ -35,7 +40,6 @@ export default function useUserPlaylists(userId: string) {
 
       return await response.json();
     },
-    refetchOnReconnect: false,
     refetchOnWindowFocus: false,
     onError: error => {
       toast.error(error.message);
