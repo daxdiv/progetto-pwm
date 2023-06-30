@@ -1,41 +1,16 @@
-import "./styles/globals.css";
-
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
-import { Triangle } from "react-loader-spinner";
-import { delay } from "./utils/helpers";
 import { toast } from "react-hot-toast";
-import { useQuery } from "react-query";
-
-const ONE_HOUR_MS = 1000 * 60 * 60;
 
 function SignIn() {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const { data, isLoading } = useQuery({
-    queryKey: "get-access-token",
-    queryFn: async () => {
-      await delay();
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/auth/access-token`
-      );
-      const data = await response.json();
-
-      return data;
-    },
-    refetchInterval: ONE_HOUR_MS,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-  });
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  const serverError = data && data.error;
 
   const handleSignIn = async () => {
     const email = emailRef.current?.value;
@@ -89,56 +64,40 @@ function SignIn() {
     }
   }, [searchParams]);
 
-  if (!serverError && data) {
-    localStorage.setItem("access_token", data.access_token);
-  }
-
   return (
     <>
       <CenteredContainer className="flex-col gap-2">
-        {isLoading ? (
-          <Triangle
-            height="80"
-            width="80"
-            color="#059669"
-            ariaLabel="triangle-loading"
-            visible={true}
-          />
-        ) : (
-          <>
-            <Input
-              variant="neutral"
-              size="sm"
-              placeholder="Email"
-              type="email"
-              ref={emailRef}
-            />
-            <Input
-              variant="neutral"
-              size="sm"
-              placeholder="Password"
-              type="password"
-              ref={passwordRef}
-            />
+        <Input
+          variant="neutral"
+          size="sm"
+          placeholder="Email"
+          type="email"
+          ref={emailRef}
+        />
+        <Input
+          variant="neutral"
+          size="sm"
+          placeholder="Password"
+          type="password"
+          ref={passwordRef}
+        />
 
-            <Button
-              type="button"
-              text="Login"
-              className="mt-2"
-              onClick={handleSignIn}
-              // className={clsx({ "cursor-not-allowed": isLoading })}
-            />
-            <p className="text-sm mt-3">
-              Non hai un account?{" "}
-              <a
-                href="/sign-up"
-                className="text-emerald-600 hover:underline"
-              >
-                Registrati
-              </a>
-            </p>
-          </>
-        )}
+        <Button
+          type="button"
+          text="Login"
+          className="mt-2"
+          onClick={handleSignIn}
+          // className={clsx({ "cursor-not-allowed": isLoading })}
+        />
+        <p className="text-sm mt-3">
+          Non hai un account?{" "}
+          <a
+            href="/sign-up"
+            className="text-emerald-600 hover:underline"
+          >
+            Registrati
+          </a>
+        </p>
       </CenteredContainer>
     </>
   );

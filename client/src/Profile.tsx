@@ -33,8 +33,6 @@ function Profile() {
     }
   }, [searchParams]);
 
-  // TODO: gli input devono essere compilati con i dati dell'utente
-
   const handleUpdateProfile = async () => {
     const username = usernameRef.current?.value;
     const email = emailRef.current?.value;
