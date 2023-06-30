@@ -1,5 +1,3 @@
-import "react-toggle/style.css";
-
 import { useRef, useState } from "react";
 
 import Button from "./components/ui/Button";
@@ -9,7 +7,7 @@ import Select from "react-select";
 import Toggle from "react-toggle";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
-import { selectStylesConfig } from "./utils/selectStylesConfig";
+import { multiSelectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
 import { truncate } from "./utils/helpers";
 import useTracks from "./hooks/useTracks";
@@ -128,7 +126,7 @@ function NewPlaylist() {
               }))}
               placeholder="Seleziona le canzoni"
               className="outline-none"
-              styles={selectStylesConfig}
+              styles={multiSelectStylesConfig}
               onChange={selected => {
                 setTracks(() =>
                   selected.map(s => {

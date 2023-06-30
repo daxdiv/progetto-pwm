@@ -1,6 +1,8 @@
 import "./styles/globals.css";
+import "react-toggle/style.css";
 
 import { Route, Routes } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 
 import BrowsePlaylists from "./BrowsePlaylists";
 import EditPlaylist from "./EditPlaylist";
@@ -10,9 +12,32 @@ import Profile from "./Profile";
 import Protected from "./Protected";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
-import { Toaster } from "react-hot-toast";
+import { useQuery } from "react-query";
+
+const FIVE_MINUTES_MS = 1000 * 60 * 5;
+const refetchInterval = 1000 * 60 * 60 - FIVE_MINUTES_MS; // 55 minuti, per essere sicuri il token non scada
 
 function App() {
+  useQuery({
+    queryKey: "get-access-token",
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/access-token`
+      );
+      const data = await response.json();
+
+      return data;
+    },
+    refetchInterval,
+    refetchOnWindowFocus: false,
+    onError: () => {
+      toast.error("Errore durante il refresh del token");
+    },
+    onSuccess: data => {
+      localStorage.setItem("access_token", data.access_token);
+    },
+  });
+
   return (
     <>
       <Toaster

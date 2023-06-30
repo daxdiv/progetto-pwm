@@ -1,5 +1,3 @@
-import "./styles/globals.css";
-
 import { useRef, useState } from "react";
 
 import Button from "./components/ui/Button";
@@ -9,7 +7,7 @@ import Select from "react-select";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
 import { delay } from "./utils/helpers";
-import { selectStylesConfig } from "./utils/selectStylesConfig";
+import { multiSelectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
@@ -124,7 +122,7 @@ function SignUp() {
             <p className="text-xs font-normal">Seleziona i generi musicali preferiti:*</p>
             <Select
               isMulti
-              styles={selectStylesConfig}
+              styles={multiSelectStylesConfig}
               placeholder="Seleziona i generi musicali"
               className="text-xs"
               options={(data?.genres || []).map(g => ({
