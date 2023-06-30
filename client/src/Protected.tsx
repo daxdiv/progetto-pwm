@@ -1,9 +1,10 @@
 import { Navigate } from "react-router-dom";
+import useAuth from "./hooks/useAuth";
 
 function Protected({ children }: { children: React.ReactNode }) {
-  const isSignedIn = localStorage.getItem("user");
+  const auth = useAuth();
 
-  if (!isSignedIn) {
+  if (!auth) {
     return (
       <Navigate
         to="/?error=Devi effettuare prima il login"

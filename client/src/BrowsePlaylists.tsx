@@ -1,75 +1,23 @@
-import { delay, formatDate, formatDuration } from "./utils/helpers";
+import { formatDate, formatDuration } from "./utils/helpers";
 
-import { AiFillInfoCircle } from "react-icons/ai";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import { FaFileImport } from "react-icons/fa";
 import Input from "./components/ui/Input";
 import Select from "react-select";
 import Toggle from "react-toggle";
 import { Triangle } from "react-loader-spinner";
+import { selectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
-import { useQuery } from "react-query";
+import usePublicPlaylists from "./hooks/usePublicPlaylists";
 import { useState } from "react";
 
-type Track = {
-  name: string;
-  artists: string[];
-  duration: number;
-};
-type Playlist = {
-  id: string;
-  title: string;
-  genres: string[];
-  tags: string[];
-  tracks: Track[];
-  tracksCount: number;
-  duration: number;
-  isPublic: boolean;
-  createdAt: string;
-};
 type FilterCriteria = "track-name" | "tags" | "artist";
 
 function BrowsePlaylists() {
   const [sortDateAsc, setSortDateAsc] = useState(true);
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>("track-name");
   const [searchValue, setSearchValue] = useState("");
-  const {
-    data: playlists,
-    isLoading,
-    error,
-  } = useQuery<Playlist[], Error>({
-    queryKey: "fetch-public-playlists",
-    queryFn: async () => {
-      const userDataString = localStorage.getItem("user");
-
-      if (!userDataString) {
-        toast(<p>Accedi per salvare una playlist</p>, {
-          icon: <AiFillInfoCircle className="text-yellow-400 text-xl" />,
-        });
-        return;
-      }
-
-      const userDataJSON = JSON.parse(userDataString);
-      const userId = userDataJSON._id;
-
-      await delay();
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/playlist/${userId}`
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.message);
-        return;
-      }
-
-      return data;
-    },
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-  });
+  const { playlists, isLoading, error, isRefetching } = usePublicPlaylists();
 
   const handleSavePlaylist = async (playlistId: string) => {
     const userDataString = localStorage.getItem("user");
@@ -105,6 +53,11 @@ function BrowsePlaylists() {
 
     toast.success(data.message);
   };
+  const handleFilterCrieriaChange = (e: { value: FilterCriteria; label: string }) => {
+    if (!e) return;
+
+    setFilterCriteria(e.value);
+  };
 
   if (error) {
     toast.error(error.message);
@@ -113,13 +66,13 @@ function BrowsePlaylists() {
   return (
     <>
       <CenteredContainer className="flex-col gap-2">
-        {!error && !isLoading && (
-          <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-2">
+        {!error && !isLoading && !isRefetching && (
+          <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-2 mt-12">
             Sfoglia playlist pubbliche
           </h1>
         )}
 
-        {isLoading && (
+        {(isLoading || isRefetching) && (
           <Triangle
             height="80"
             width="80"
@@ -140,7 +93,7 @@ function BrowsePlaylists() {
             </a>
           </>
         )}
-        {!isLoading && (!playlists || !playlists.length) && (
+        {!isLoading && !isRefetching && (!playlists || !playlists.length) && (
           <>
             <p className="text-gray-500 text-xl">Nessuna playlist trovata</p>
             <a
@@ -152,7 +105,7 @@ function BrowsePlaylists() {
           </>
         )}
 
-        {!error && playlists && playlists.length > 0 && (
+        {!error && !isLoading && !isRefetching && playlists && playlists.length > 0 && (
           <>
             <div className="font-normal text-sm mb-2 flex gap-3">
               <div className="flex justify-center items-center">
@@ -174,41 +127,7 @@ function BrowsePlaylists() {
                 Filtra per
               </label>
               <Select
-                styles={{
-                  control: provided => ({
-                    ...provided,
-                    outline: "none",
-                    backgroundColor: "#1f2937",
-                    borderWidth: "2px",
-                    borderColor: "#6b7280",
-                    color: "#fff",
-                    cursor: "pointer",
-                    "&:hover": {
-                      borderColor: "#059669",
-                    },
-                  }),
-                  option: provided => ({
-                    ...provided,
-                    backgroundColor: "#1f2937",
-                    color: "#fff",
-                    fontSize: "0.75rem",
-                    "&:hover": {
-                      backgroundColor: "#4B5563",
-                      cursor: "pointer",
-                    },
-                  }),
-                  menu: provided => ({
-                    ...provided,
-                    backgroundColor: "#1f2937",
-                    color: "#fff",
-                    fontSize: "0.75rem",
-                  }),
-                  singleValue: provided => ({
-                    ...provided,
-                    color: "#fff",
-                    fontSize: "0.75rem",
-                  }),
-                }}
+                styles={selectStylesConfig}
                 className="w-56"
                 placeholder="Ricerca per"
                 id="filtro"
@@ -219,9 +138,9 @@ function BrowsePlaylists() {
                   { value: "artist", label: "Cantante" },
                 ]}
                 onChange={e => {
-                  if (!e) return;
-
-                  setFilterCriteria(e.value as FilterCriteria);
+                  handleFilterCrieriaChange(
+                    e as { value: FilterCriteria; label: string }
+                  );
                 }}
               />
               <Input
@@ -238,6 +157,8 @@ function BrowsePlaylists() {
         )}
 
         {!error &&
+          !isLoading &&
+          !isRefetching &&
           playlists &&
           playlists
             .sort((p1, p2) => {

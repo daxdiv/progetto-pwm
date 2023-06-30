@@ -10,23 +10,10 @@ import Select from "react-select";
 import Toggle from "react-toggle";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
-import { delay } from "./utils/helpers";
-import { selectStylesConfig } from "./utils/selectStylesConfig";
+import { multiSelectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
-import { useQuery } from "react-query";
+import useTracks from "./hooks/useTracks";
 
-type Artist = {
-  id: string;
-  name: string;
-};
-type TrackResponse = {
-  name: string;
-  artists: Artist[];
-  album: {
-    release_date: string;
-  };
-  duration_ms: number;
-};
 type Track = {
   name: string;
   artists?: string[];
@@ -42,34 +29,9 @@ function EditPlaylist() {
   const [description, setDescription] = useState("");
   const tagsRef = useRef<HTMLInputElement>(null);
   const [isPublic, setIsPublic] = useState(false);
-  const { data, isLoading, error } = useQuery<TrackResponse[], SpotifyApiError>({
-    queryKey: ["fetch-tracks"],
-    queryFn: async () => {
-      await delay();
-
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_SPOTIFY_BASE_URL
-        }/search?q=track&type=track&market=IT&limit=50&offset=0`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
-      );
-      const data = await response.json();
-
-      return data.tracks.items;
-    },
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    onError: error => {
-      toast.error(error.message);
-    },
-  });
   const { id: playlistId } = useParams();
   const navigate = useNavigate();
+  const { fetchedTracks, isLoading, isRefetching, error } = useTracks();
 
   useEffect(() => {
     const userDataString = localStorage.getItem("user");
@@ -100,6 +62,7 @@ function EditPlaylist() {
       }
 
       if (response.status === 403) {
+        // COMMENT: forbidden
         navigate("/profile");
         return;
       }
@@ -164,7 +127,7 @@ function EditPlaylist() {
       return;
     }
 
-    navigate("/profile");
+    navigate("/profile?success=Playlist aggiornata con successo");
   };
   const handleDeletePlaylist = async () => {
     if (!playlistId) {
@@ -211,32 +174,35 @@ function EditPlaylist() {
         </h1>
       )}
 
-      {oldTracks.length > 0 && (
+      {!error && !isLoading && !isRefetching && oldTracks.length > 0 && (
         <div className="flex items-start gap-2">
           <p className="font-normal text-xs">Canzoni già presenti in playlist:</p>
           <p className="font-normal text-xs">{oldTracks.length}</p>
         </div>
       )}
 
-      {oldTracks.map((t, i) => (
-        <div
-          key={`${t.name}-${i}`}
-          className="flex items-center gap-2"
-        >
-          <p className="font-normal text-xs">{t.name}</p>
-          <p
-            className="text-red-500 text-xs underline cursor-pointer"
-            onClick={() => {
-              setOldTracks(tracks => tracks.filter((_, index) => index !== i));
-            }}
+      {!error &&
+        !isLoading &&
+        !isRefetching &&
+        oldTracks.map((t, i) => (
+          <div
+            key={`${t.name}-${i}`}
+            className="flex items-center gap-2"
           >
-            Elimina
-          </p>
-        </div>
-      ))}
+            <p className="font-normal text-xs">{t.name}</p>
+            <p
+              className="text-red-500 text-xs underline cursor-pointer"
+              onClick={() => {
+                setOldTracks(tracks => tracks.filter((_, index) => index !== i));
+              }}
+            >
+              Elimina
+            </p>
+          </div>
+        ))}
       {!error && (
         <>
-          {isLoading ? (
+          {isLoading || isRefetching ? (
             <Triangle
               height="40"
               width="40"
@@ -248,7 +214,7 @@ function EditPlaylist() {
             <Select
               isMulti
               isSearchable
-              options={(data || [])
+              options={(fetchedTracks || [])
                 .filter(t => {
                   const isInPlaylist = oldTracks.some(
                     ot =>
@@ -268,7 +234,7 @@ function EditPlaylist() {
                 }))}
               placeholder="Seleziona nuove canzoni"
               className="outline-none"
-              styles={selectStylesConfig}
+              styles={multiSelectStylesConfig}
               onChange={selected => {
                 setTracks(() =>
                   selected.map(s => {

@@ -1,5 +1,5 @@
-import { delay, formatDate } from "./utils/helpers";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { BiSolidLock } from "react-icons/bi";
 import Button from "./components/ui/Button";
@@ -7,20 +7,10 @@ import CenteredContainer from "./components/ui/CenteredContainer";
 import { FaTrashAlt } from "react-icons/fa";
 import Input from "./components/ui/Input";
 import { Triangle } from "react-loader-spinner";
+import { formatDate } from "./utils/helpers";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "react-query";
-
-type Playlist = {
-  id: string;
-  title: string;
-  genres: string[];
-  tags: string[];
-  tracksCount: number;
-  duration: number;
-  isPublic: boolean;
-  createdAt: string;
-};
+import useAuth from "./hooks/useAuth";
+import useUserPlaylists from "./hooks/useUserPlaylists";
 
 function Profile() {
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -29,69 +19,22 @@ function Profile() {
   const navigate = useNavigate();
   const [preferredGenres, setPreferredGenres] = useState<Set<string>>(new Set());
   const [description, setDescription] = useState("");
-  const {
-    data: playlists,
-    isLoading,
-    error,
-  } = useQuery<Playlist[], SpotifyApiError>({
-    queryKey: ["fetch-user-playlists"],
-    queryFn: async () => {
-      await delay();
-
-      const userDataString = localStorage.getItem("user");
-
-      if (!userDataString) {
-        return;
-      }
-
-      const userDataJSON = JSON.parse(userDataString);
-      const userId = userDataJSON._id;
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/user/${userId}/playlists`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      return await response.json();
-    },
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-    onSuccess: data => {
-      console.log(data);
-    },
-    onError: error => {
-      toast.error(error.message);
-    },
-  });
+  const [searchParams] = useSearchParams();
+  const auth = useAuth();
+  const { playlists, isLoading, isRefetching, error } = useUserPlaylists(auth?._id || "");
 
   useEffect(() => {
-    const userDataString = localStorage.getItem("user");
-
-    if (!userDataString) {
-      return;
+    if (searchParams.get("success")) {
+      toast.success(searchParams.get("success"));
+      searchParams.delete("success");
     }
-
-    const userDataJSON = JSON.parse(userDataString);
-    const { username, email, password, preferredGenres, description } = userDataJSON;
-
-    if (!preferredGenres) {
-      return;
+    if (searchParams.get("error")) {
+      toast.error(searchParams.get("error"));
+      searchParams.delete("error");
     }
+  }, [searchParams]);
 
-    if (!usernameRef.current || !emailRef.current || !passwordRef.current) {
-      return;
-    }
-
-    usernameRef.current.value = username;
-    emailRef.current.value = email;
-    passwordRef.current.value = password;
-    setPreferredGenres(new Set(preferredGenres));
-    setDescription(description);
-  }, []);
+  // TODO: gli input devono essere compilati con i dati dell'utente
 
   const handleUpdateProfile = async () => {
     const username = usernameRef.current?.value;
@@ -112,15 +55,12 @@ function Profile() {
       return;
     }
 
-    const userDataString = localStorage.getItem("user");
-
-    if (!userDataString) {
+    if (!auth) {
       navigate("/?error=Devi prima effettuare il login");
       return;
     }
 
-    const userDataJSON = JSON.parse(userDataString);
-    const userId = userDataJSON._id;
+    const { _id: userId } = auth;
 
     const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/user/${userId}`, {
       method: "PUT",
@@ -146,15 +86,12 @@ function Profile() {
     toast.success("Profilo aggiornato correttamente");
   };
   const handleDeleteProfile = async () => {
-    const userDataString = localStorage.getItem("user");
-
-    if (!userDataString) {
+    if (!auth) {
       navigate("/?error=Devi prima effettuare il login");
       return;
     }
 
-    const userDataJSON = JSON.parse(userDataString);
-    const userId = userDataJSON._id;
+    const { _id: userId } = auth;
 
     const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/user/${userId}`, {
       method: "DELETE",
@@ -259,7 +196,7 @@ function Profile() {
           Le tue Playlist
         </h1>
 
-        {isLoading && (
+        {(isLoading || isRefetching) && (
           <div className="flex justify-center items-center">
             <Triangle
               height="40"
@@ -277,7 +214,7 @@ function Profile() {
           </div>
         )}
 
-        {playlists && playlists.length === 0 && (
+        {!isLoading && !isRefetching && playlists && playlists.length === 0 && (
           <div className="flex justify-center items-center">
             <p className="text-gray-500 text-md font-normal">
               Non hai ancora creato nessuna playlist
@@ -287,6 +224,7 @@ function Profile() {
 
         {!error &&
           !isLoading &&
+          !isRefetching &&
           playlists?.map(p => (
             <>
               <div
