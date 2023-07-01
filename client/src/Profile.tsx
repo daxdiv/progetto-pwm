@@ -10,6 +10,7 @@ import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import useAuth from "./hooks/useAuth";
+import useUser from "./hooks/useUser";
 import useUserPlaylists from "./hooks/useUserPlaylists";
 
 function Profile() {
@@ -22,6 +23,24 @@ function Profile() {
   const [searchParams] = useSearchParams();
   const auth = useAuth();
   const { data, isLoading, isRefetching, error } = useUserPlaylists(auth?._id || "");
+
+  useUser(auth?._id || "", {
+    onSuccess: data => {
+      if (data.preferredGenres) {
+        setPreferredGenres(new Set(data.preferredGenres));
+      }
+      if (data.description) {
+        setDescription(data.description);
+      }
+      if (usernameRef.current) {
+        usernameRef.current.value = data.username;
+      }
+      if (emailRef.current) {
+        emailRef.current.value = data.email;
+      }
+    },
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
     if (searchParams.get("success")) {
@@ -128,10 +147,16 @@ function Profile() {
           type="email"
           ref={emailRef}
         />
+        <label
+          htmlFor="password"
+          className="font-normal text-xs"
+        >
+          Inserisci la password per confermare o inseriscine una nuova:
+        </label>
         <Input
           variant="neutral"
           size="sm"
-          placeholder="Nuova password"
+          placeholder="Password"
           type="password"
           ref={passwordRef}
         />
@@ -192,7 +217,7 @@ function Profile() {
 
         <div
           className={clsx({
-            "grid grid-cols-2 gap-4": !isLoading && !isRefetching && data?.userPlaylists,
+            "grid grid-cols-2 gap-4": !isLoading && !isRefetching,
           })}
         >
           {(isLoading || isRefetching) && (
@@ -221,8 +246,7 @@ function Profile() {
 
             {!isLoading &&
               !isRefetching &&
-              data?.userPlaylists &&
-              data.userPlaylists.length === 0 && (
+              (!data?.userPlaylists || data.userPlaylists.length === 0) && (
                 <div className="flex justify-center items-center">
                   <p className="text-gray-500 text-md font-normal">
                     Non hai ancora creato nessuna playlist
@@ -232,10 +256,11 @@ function Profile() {
             {!error &&
               !isLoading &&
               !isRefetching &&
-              data?.userPlaylists.map(p => (
+              data?.userPlaylists?.map(p => (
                 <PlaylistCard
                   playlist={p}
                   owned
+                  key={`owned-${p.id}`}
                 />
               ))}
           </div>
@@ -249,8 +274,7 @@ function Profile() {
 
             {!isLoading &&
               !isRefetching &&
-              data?.savedPlaylists &&
-              data.savedPlaylists.length === 0 && (
+              (!data?.savedPlaylists || data?.savedPlaylists?.length === 0) && (
                 <div className="flex justify-center items-center">
                   <p className="text-gray-500 text-md font-normal">
                     Non hai ancora salvato nessuna playlist
@@ -260,10 +284,10 @@ function Profile() {
             {!error &&
               !isLoading &&
               !isRefetching &&
-              data?.savedPlaylists.map(p => (
+              data?.savedPlaylists?.map(p => (
                 <PlaylistCard
                   playlist={p}
-                  saveable
+                  key={`saved-${p.id}`}
                 />
               ))}
           </div>
