@@ -8,7 +8,7 @@ import { checkIds } from "../middlewares";
 
 const router = express.Router();
 
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
 
   if (!id) {
@@ -65,11 +65,11 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
   }
 });
 
-router.get("/:id/playlists", checkIds, async (req: Request, res: Response) => {
-  const { id } = req.params;
+router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) => {
+  const { userId } = req.params;
 
   try {
-    const userPlaylists = await Playlist.find({ userId: id });
+    const userPlaylists = await Playlist.find({ userId });
 
     if (!userPlaylists) {
       res
@@ -78,8 +78,36 @@ router.get("/:id/playlists", checkIds, async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(StatusCodes.OK).json(
-      userPlaylists.map(p => ({
+    const user = await User.findOne({
+      _id: userId,
+    });
+
+    const savedPlaylists = await Playlist.find({
+      _id: { $in: user?.savedPlaylists },
+    });
+
+    console.log(savedPlaylists);
+
+    const mappedUserPlaylists = userPlaylists.map(p => ({
+      id: p._id,
+      title: p.title,
+      tags: p.tags,
+      tracks: p.tracks.map(t => ({
+        name: t.name,
+        artists: t.artists,
+        duration: t.duration,
+      })),
+      genres: p.genres,
+      createdAt: p.createdAt,
+      duration: p.tracks.reduce((acc, curr) => acc + curr.duration, 0),
+      isPublic: p.isPublic,
+    }));
+
+    if (!savedPlaylists.length) {
+      res.status(StatusCodes.OK).json(mappedUserPlaylists); //COMMENT: 200
+      return;
+    } else {
+      const mappedSavedPlaylists = savedPlaylists.map(p => ({
         id: p._id,
         title: p.title,
         tags: p.tags,
@@ -92,10 +120,14 @@ router.get("/:id/playlists", checkIds, async (req: Request, res: Response) => {
         createdAt: p.createdAt,
         duration: p.tracks.reduce((acc, curr) => acc + curr.duration, 0),
         isPublic: p.isPublic,
-      }))
-    ); //COMMENT: 200
+      }));
 
-    return;
+      res.status(StatusCodes.OK).json({
+        userPlaylists: mappedUserPlaylists,
+        savedPlaylists: mappedSavedPlaylists,
+      }); //COMMENT: 200
+      return;
+    }
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
