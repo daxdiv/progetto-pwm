@@ -145,7 +145,7 @@ function BrowsePlaylists() {
                   );
                 case "tags":
                   return p.tags.some(t =>
-                    t.toLowerCase().includes(searchValue.toLowerCase())
+                    t.toLowerCase().startsWith(searchValue.toLowerCase())
                   );
                 case "artist":
                   return p.tracks.some(t =>
