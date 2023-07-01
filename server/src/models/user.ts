@@ -6,6 +6,7 @@ type User = {
   email: string;
   password: string;
   preferredGenres: string[];
+  preferredArtists: string[];
   description: string;
   savedPlaylists: mongoose.Schema.Types.ObjectId[];
   comparePassword: (password: string) => Promise<boolean>;
@@ -27,6 +28,10 @@ const userSchema = new mongoose.Schema<User>({
     required: true,
   },
   preferredGenres: {
+    type: [String],
+    default: [],
+  },
+  preferredArtists: {
     type: [String],
     default: [],
   },
