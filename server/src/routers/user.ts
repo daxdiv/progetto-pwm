@@ -57,9 +57,17 @@ router.delete("/:id", checkIds, async (req: Request, res: Response) => {
 
 router.put("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { username, email, password, preferredGenres, description } = req.body;
+  const { username, email, password, preferredGenres, preferredArtists, description } =
+    req.body;
 
-  if (!username && !email && !password && !preferredGenres && !description) {
+  if (
+    !username &&
+    !email &&
+    !password &&
+    !preferredGenres &&
+    !preferredArtists &&
+    !description
+  ) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: "Nessun campo da modificare" }); //COMMENT: 400
     return;
   }
@@ -74,7 +82,7 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
 
     const updatedUser = await User.findOneAndUpdate(
       { _id: id },
-      { username, email, password, preferredGenres, description },
+      { username, email, password, preferredGenres, preferredArtists, description },
       { new: true }
     );
 

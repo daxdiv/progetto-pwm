@@ -76,7 +76,8 @@ router.post("/sign-in", async (req: Request, res: Response) => {
 });
 
 router.post("/sign-up", async (req: Request, res: Response) => {
-  const { username, email, password, preferredGenres, description } = req.body;
+  const { username, email, password, preferredGenres, preferredArtists, description } =
+    req.body;
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
   if (!emailRegex.test(email)) {
@@ -90,6 +91,7 @@ router.post("/sign-up", async (req: Request, res: Response) => {
       email: email.toLowerCase(),
       password: password.toLowerCase(),
       preferredGenres,
+      preferredArtists,
       description,
     });
 
