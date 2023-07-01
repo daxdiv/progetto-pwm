@@ -18,8 +18,8 @@ type Playlist = {
   createdAt: string;
 };
 type Response = {
-  userPlaylists: Playlist[];
-  savedPlaylists: Playlist[];
+  userPlaylists?: Playlist[];
+  savedPlaylists?: Playlist[];
 };
 
 export default function useUserPlaylists(userId: string) {
