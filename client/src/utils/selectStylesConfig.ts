@@ -32,6 +32,7 @@ const selectStylesConfig: StylesConfig = {
   singleValue: provided => ({
     ...provided,
     color: "#ffffff",
+    // color: "blue",
     fontSize: "0.75rem",
   }),
 };

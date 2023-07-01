@@ -1,11 +1,13 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import AsyncSelect from "react-select/async";
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
 import Select from "react-select";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
+import debounce from "debounce";
 import { delay } from "./utils/helpers";
 import { multiSelectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
@@ -13,15 +15,21 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 
 type Response = { genres: string[] };
+type SelectOption = { value: string; label: string };
 
 function SignUp() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const [artists, setArtists] = useState<SelectOption[]>([]);
+  const [selectedArtists, setSelectedArtists] = useState<Set<string>>(new Set());
   const [selectedGenres, setSelectedGenres] = useState<Set<string>>(new Set());
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery<Response, SpotifyApiError>({
+  const { data: genresData, isLoading: isLoadingGenres } = useQuery<
+    Response,
+    SpotifyApiError
+  >({
     queryKey: ["fetch-genres"],
     queryFn: async () => {
       await delay();
@@ -42,6 +50,38 @@ function SignUp() {
     },
   });
 
+  const handleFetchArtists = async (inputValue: string) => {
+    if (!inputValue) return [];
+
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_SPOTIFY_BASE_URL
+        }/search?q=${inputValue}&type=artist&market=IT&limit=50`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message);
+        return [];
+      }
+
+      setArtists(
+        data.artists.items.map((artist: { name: string; id: string }) => ({
+          value: artist.name,
+          label: artist.name,
+        }))
+      );
+    } catch (_error) {
+      toast.error("Errore durante la ricerca degli artisti");
+    }
+  };
   const handleSignUp = async () => {
     const username = usernameRef.current?.value;
     const email = emailRef.current?.value;
@@ -71,6 +111,7 @@ function SignUp() {
         email,
         password,
         preferredGenres: Array.from(selectedGenres),
+        preferredArtists: Array.from(selectedArtists),
         description,
       }),
     });
@@ -84,6 +125,16 @@ function SignUp() {
 
     navigate("/?success=Utente registrato correttamente");
   };
+  const loadOptionsCb = (inputValue: string, cb: (options: SelectOption[]) => void) => {
+    handleFetchArtists(inputValue);
+    cb(artists);
+  };
+
+  const debounced = debounce(loadOptionsCb, 500);
+
+  useEffect(() => {
+    console.log(selectedArtists);
+  }, [selectedArtists]);
 
   return (
     <>
@@ -109,7 +160,7 @@ function SignUp() {
           type="password"
           ref={passwordRef}
         />
-        {isLoading ? (
+        {isLoadingGenres ? (
           <Triangle
             height="40"
             width="40"
@@ -119,13 +170,33 @@ function SignUp() {
           />
         ) : (
           <>
+            <p className="text-xs font-normal">Seleziona i tuoi artisti preferiti</p>
+            <div className="flex gap-3">
+              <AsyncSelect
+                isMulti
+                loadOptions={debounced}
+                className="text-xs w-56"
+                styles={multiSelectStylesConfig}
+                placeholder="Cerca i tuoi artisti preferiti"
+                noOptionsMessage={() => "Nessun artista trovato"}
+                loadingMessage={() => "Caricamento..."}
+                onChange={selected => {
+                  setSelectedArtists(
+                    new Set(
+                      selected?.map(s => (s as { value: string; label: string }).value)
+                    )
+                  );
+                }}
+              />
+            </div>
+
             <p className="text-xs font-normal">Seleziona i generi musicali preferiti:*</p>
             <Select
               isMulti
               styles={multiSelectStylesConfig}
               placeholder="Seleziona i generi musicali"
               className="text-xs"
-              options={(data?.genres || []).map(g => ({
+              options={(genresData?.genres || []).map(g => ({
                 value: g,
                 label: g.charAt(0).toUpperCase() + g.slice(1),
               }))}
@@ -150,11 +221,11 @@ function SignUp() {
           type="button"
           text="Registrati"
           onClick={handleSignUp}
-          disabled={isLoading}
+          disabled={isLoadingGenres}
           className={clsx(
             {
-              "cursor-not-allowed": isLoading,
-              "bg-emerald-800": isLoading,
+              "cursor-not-allowed": isLoadingGenres,
+              "bg-emerald-800": isLoadingGenres,
             },
             "mt-2"
           )}
