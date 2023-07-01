@@ -4,6 +4,7 @@ import { BiSolidLock } from "react-icons/bi";
 import { FaFileImport } from "react-icons/fa";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
+import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 type Track = {
@@ -35,17 +36,15 @@ const PlaylistCard: React.FC<Props> = ({
   extended = false,
 }) => {
   const navigate = useNavigate();
+  const auth = useAuth();
 
   const handleSavePlaylist = async (playlistId: string) => {
-    const userDataString = localStorage.getItem("user");
-
-    if (!userDataString) {
+    if (!auth) {
       toast.error("Devi aver fatto l'accesso per salvare una playlist");
       return;
     }
 
-    const userDataJSON = JSON.parse(userDataString);
-    const userId = userDataJSON._id;
+    const { _id: userId } = auth;
 
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/user/save-playlist`,
@@ -79,7 +78,7 @@ const PlaylistCard: React.FC<Props> = ({
           "hover:scale-[1.015]": owned,
           "transition-transform": owned,
         },
-        `relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800 w-1/2`
+        `relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800`
       )}
       key={playlist.id}
       onClick={() => {

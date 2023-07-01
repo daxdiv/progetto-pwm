@@ -54,14 +54,14 @@ function EditPlaylist() {
       );
       const data = await response.json();
 
-      if (!response.ok) {
-        toast.error(data.message);
+      // COMMENT: forbidden
+      if (response.status === 403) {
+        navigate("/profile?error=Non hai i permessi per modificare questa playlist");
         return;
       }
 
-      if (response.status === 403) {
-        // COMMENT: forbidden
-        navigate("/profile");
+      if (!response.ok) {
+        toast.error(data.message);
         return;
       }
 

@@ -56,11 +56,11 @@ function SignIn() {
   useEffect(() => {
     if (searchParams.get("success")) {
       toast.success(searchParams.get("success"));
-      searchParams.delete("success");
+      window.history.replaceState(null, "", window.location.pathname);
     }
     if (searchParams.get("error")) {
       toast.error(searchParams.get("error"));
-      searchParams.delete("error");
+      window.history.replaceState(null, "", window.location.pathname);
     }
   }, [searchParams]);
 
