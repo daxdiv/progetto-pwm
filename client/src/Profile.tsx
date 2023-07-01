@@ -19,6 +19,7 @@ function Profile() {
   const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const [preferredGenres, setPreferredGenres] = useState<Set<string>>(new Set());
+  const [preferredArtists, setPreferredArtists] = useState<Set<string>>(new Set());
   const [description, setDescription] = useState("");
   const [searchParams] = useSearchParams();
   const auth = useAuth();
@@ -29,6 +30,9 @@ function Profile() {
       if (data.preferredGenres) {
         setPreferredGenres(new Set(data.preferredGenres));
       }
+      if (data.preferredArtists) {
+        setPreferredArtists(new Set(data.preferredArtists));
+      }
       if (data.description) {
         setDescription(data.description);
       }
@@ -37,6 +41,13 @@ function Profile() {
       }
       if (emailRef.current) {
         emailRef.current.value = data.email;
+      }
+    },
+    onError: error => {
+      if (error.message.includes("401")) {
+        navigate("/?error=Devi prima effettuare il login");
+      } else {
+        toast.error(error.message);
       }
     },
     refetchOnWindowFocus: false,
@@ -89,6 +100,7 @@ function Profile() {
         email,
         password,
         preferredGenres: Array.from(preferredGenres),
+        preferredArtists: Array.from(preferredArtists),
         description,
       }),
     });
@@ -178,6 +190,33 @@ function Profile() {
                       setPreferredGenres(prevGenres => {
                         const newGenres = new Set(prevGenres);
                         newGenres.delete(genre);
+
+                        return newGenres;
+                      });
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {preferredArtists.size !== 0 && (
+          <>
+            <p className="text-sm font-normal">Modifica generi musicali preferiti:*</p>
+
+            <ul className="grid grid-cols-2 font-normal text-xs gap-2">
+              {Array.from(preferredArtists).map(artist => (
+                <li
+                  key={`selected-${artist}`}
+                  className="text-white bg-gray-800 w-full rounded-xl px-2 py-1 flex items-center justify-between gap-1"
+                >
+                  <span>{artist}</span>
+                  <FaTrashAlt
+                    className="text-red-500 cursor-pointer hover:scale-105 transition-transform"
+                    onClick={() => {
+                      setPreferredArtists(prevArtists => {
+                        const newGenres = new Set(prevArtists);
+                        newGenres.delete(artist);
 
                         return newGenres;
                       });
