@@ -21,7 +21,7 @@ export default function useUser(
     queryFn: async () => {
       const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/user/${userId}`);
 
-      if (response.status === 404) navigate("/?profile=Nessun utente trovato");
+      if (response.status === 404) navigate("/error?=Nessun utente trovato");
 
       return (await response.json()) as UserData;
     },
