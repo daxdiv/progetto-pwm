@@ -7,6 +7,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import Input from "./components/ui/Input";
 import PlaylistCard from "./components/PlaylistCard";
 import { Triangle } from "react-loader-spinner";
+import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import useAuth from "./hooks/useAuth";
 import useUserPlaylists from "./hooks/useUserPlaylists";
@@ -20,16 +21,16 @@ function Profile() {
   const [description, setDescription] = useState("");
   const [searchParams] = useSearchParams();
   const auth = useAuth();
-  const { playlists, isLoading, isRefetching, error } = useUserPlaylists(auth?._id || "");
+  const { data, isLoading, isRefetching, error } = useUserPlaylists(auth?._id || "");
 
   useEffect(() => {
     if (searchParams.get("success")) {
       toast.success(searchParams.get("success"));
-      searchParams.delete("success");
+      window.history.replaceState(null, "", window.location.pathname);
     }
     if (searchParams.get("error")) {
       toast.error(searchParams.get("error"));
-      searchParams.delete("error");
+      window.history.replaceState(null, "", window.location.pathname);
     }
   }, [searchParams]);
 
@@ -189,45 +190,84 @@ function Profile() {
 
         <p className="text-xs font-normal">Campo opzionale*</p>
 
-        <h1 className="text-emerald-600 text-3xl mt-5 border-b border-b-emerald-600 mb-4">
-          Le tue Playlist
-        </h1>
+        <div
+          className={clsx({
+            "grid grid-cols-2 gap-4": !isLoading && !isRefetching && data?.userPlaylists,
+          })}
+        >
+          {(isLoading || isRefetching) && (
+            <div className="flex justify-center items-center mt-2">
+              <Triangle
+                height="60"
+                width="60"
+                color="#059669"
+                ariaLabel="triangle-loading"
+                visible={true}
+              />
+            </div>
+          )}
+          {error && (
+            <div className="flex justify-center items-center">
+              <p className="text-red-500 text-lg">{error.message}</p>
+            </div>
+          )}
 
-        {(isLoading || isRefetching) && (
-          <div className="flex justify-center items-center">
-            <Triangle
-              height="40"
-              width="40"
-              color="#059669"
-              ariaLabel="triangle-loading"
-              visible={true}
-            />
+          <div>
+            {!isLoading && !isRefetching && (
+              <h1 className="text-emerald-600 text-xl text-center mt-5 mb-2">
+                Le tue Playlist
+              </h1>
+            )}
+
+            {!isLoading &&
+              !isRefetching &&
+              data?.userPlaylists &&
+              data.userPlaylists.length === 0 && (
+                <div className="flex justify-center items-center">
+                  <p className="text-gray-500 text-md font-normal">
+                    Non hai ancora creato nessuna playlist
+                  </p>
+                </div>
+              )}
+            {!error &&
+              !isLoading &&
+              !isRefetching &&
+              data?.userPlaylists.map(p => (
+                <PlaylistCard
+                  playlist={p}
+                  owned
+                />
+              ))}
           </div>
-        )}
 
-        {error && (
-          <div className="flex justify-center items-center">
-            <p className="text-red-500 text-lg">{error.message}</p>
+          <div>
+            {!isLoading && !isRefetching && (
+              <h1 className="text-emerald-600 text-xl text-center mt-5 mb-2">
+                Playlist salvate
+              </h1>
+            )}
+
+            {!isLoading &&
+              !isRefetching &&
+              data?.savedPlaylists &&
+              data.savedPlaylists.length === 0 && (
+                <div className="flex justify-center items-center">
+                  <p className="text-gray-500 text-md font-normal">
+                    Non hai ancora salvato nessuna playlist
+                  </p>
+                </div>
+              )}
+            {!error &&
+              !isLoading &&
+              !isRefetching &&
+              data?.savedPlaylists.map(p => (
+                <PlaylistCard
+                  playlist={p}
+                  saveable
+                />
+              ))}
           </div>
-        )}
-
-        {!isLoading && !isRefetching && playlists && playlists.length === 0 && (
-          <div className="flex justify-center items-center">
-            <p className="text-gray-500 text-md font-normal">
-              Non hai ancora creato nessuna playlist
-            </p>
-          </div>
-        )}
-
-        {!error &&
-          !isLoading &&
-          !isRefetching &&
-          playlists?.map(p => (
-            <PlaylistCard
-              playlist={p}
-              owned
-            />
-          ))}
+        </div>
       </CenteredContainer>
     </>
   );

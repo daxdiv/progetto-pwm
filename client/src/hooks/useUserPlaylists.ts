@@ -17,14 +17,13 @@ type Playlist = {
   isPublic: boolean;
   createdAt: string;
 };
+type Response = {
+  userPlaylists: Playlist[];
+  savedPlaylists: Playlist[];
+};
 
 export default function useUserPlaylists(userId: string) {
-  const {
-    data: playlists,
-    isLoading,
-    isRefetching,
-    error,
-  } = useQuery<Playlist[], SpotifyApiError>({
+  const { data, isLoading, isRefetching, error } = useQuery<Response, SpotifyApiError>({
     queryKey: ["fetch-user-playlists"],
     queryFn: async () => {
       await delay();
@@ -46,5 +45,5 @@ export default function useUserPlaylists(userId: string) {
     },
   });
 
-  return { playlists, isLoading, isRefetching, error };
+  return { data, isLoading, isRefetching, error };
 }
