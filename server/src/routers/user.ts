@@ -8,6 +8,25 @@ import { checkIds } from "../middlewares";
 
 const router = express.Router();
 
+router.get("/:id", checkIds, async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findOne({ _id: id });
+
+    if (!user) {
+      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
+      return;
+    }
+
+    res.status(StatusCodes.OK).json(user); //COMMENT: 200
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+  }
+});
+
 router.delete("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -46,6 +65,13 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
   }
 
   try {
+    const user = await User.findOne({ _id: id });
+
+    if (!user) {
+      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
+      return;
+    }
+
     const updatedUser = await User.findOneAndUpdate(
       { _id: id },
       { username, email, password, preferredGenres, description },
@@ -57,8 +83,11 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
       return;
     }
 
+    await updatedUser.save();
+
     res.status(StatusCodes.OK).json(updatedUser); //COMMENT: 200
   } catch (error) {
+    console.log(error);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
@@ -85,8 +114,6 @@ router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) =
     const savedPlaylists = await Playlist.find({
       _id: { $in: user?.savedPlaylists },
     });
-
-    console.log(savedPlaylists);
 
     const mappedUserPlaylists = userPlaylists.map(p => ({
       id: p._id,

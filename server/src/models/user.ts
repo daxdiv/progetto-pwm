@@ -39,8 +39,6 @@ const userSchema = new mongoose.Schema<User>({
 });
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
   try {
     const salt = await bcrpyt.genSalt(10);
     const hashedPassword = await bcrpyt.hash(this.password, salt);
@@ -54,6 +52,14 @@ userSchema.pre("save", async function (next) {
 });
 userSchema.methods.comparePassword = async function (password: string) {
   return await bcrpyt.compare(password, this.password);
+};
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+
+  delete user.password;
+  delete user.__v;
+
+  return user;
 };
 
 export default mongoose.model("User", userSchema);
