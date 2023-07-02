@@ -2,7 +2,6 @@ import express, { type Request, Response } from "express";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
 import User from "../models/user";
-import StatusCode from "http-status-codes";
 import capitalize from "../utils/capitalize";
 
 dotenv.config();
@@ -14,9 +13,7 @@ const url = "https://accounts.spotify.com/api/token";
 
 router.get("/access-token", async (_req: Request, res: Response) => {
   if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET) {
-    res
-      .status(StatusCode.INTERNAL_SERVER_ERROR)
-      .send("CLIENT_ID o CLIENT_SECRET mancanti"); // COMMENT: 500
+    res.status(500).send("CLIENT_ID o CLIENT_SECRET mancanti");
     return;
   }
 
@@ -33,11 +30,9 @@ router.get("/access-token", async (_req: Request, res: Response) => {
     });
     const data = await response.json();
 
-    res.status(StatusCode.OK).send(data); //COMMENT: 200
+    res.status(200).send(data);
   } catch (error) {
-    res
-      .status(StatusCode.INTERNAL_SERVER_ERROR)
-      .send({ message: "Errore lato server, riprovare più tardi" }); //COMMENT: 500
+    res.status(500).send({ message: "Errore lato server, riprovare più tardi" });
   }
 });
 
@@ -46,7 +41,7 @@ router.post("/sign-in", async (req: Request, res: Response) => {
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
   if (!emailRegex.test(email)) {
-    res.status(StatusCode.BAD_REQUEST).json({ message: "Email non valida" }); //COMMENT: 400
+    res.status(400).json({ message: "Email non valida" });
     return;
   }
 
@@ -56,22 +51,20 @@ router.post("/sign-in", async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      res
-        .status(StatusCode.NOT_FOUND)
-        .json({ error: "Nessun utente trovato con questa email" }); //COMMENT: 404
+      res.status(404).json({ error: "Nessun utente trovato con questa email" });
       return;
     }
 
     const passwordMatch = await user.comparePassword(password);
 
     if (!passwordMatch) {
-      res.status(StatusCode.UNAUTHORIZED).json({ error: "Password errata" }); //COMMENT: 401
+      res.status(401).json({ error: "Password errata" });
       return;
     }
 
-    res.status(StatusCode.OK).json(user); //COMMENT: 200
+    res.status(200).json(user);
   } catch (error) {
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: error.message }); //COMMENT: 500
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -81,7 +74,7 @@ router.post("/sign-up", async (req: Request, res: Response) => {
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
   if (!emailRegex.test(email)) {
-    res.status(StatusCode.BAD_REQUEST).json({ message: "Email non valida" }); //COMMENT: 400
+    res.status(400).json({ message: "Email non valida" });
     return;
   }
 
@@ -97,16 +90,16 @@ router.post("/sign-up", async (req: Request, res: Response) => {
 
     await user.save();
 
-    res.status(StatusCode.CREATED).json(user); //COMMENT: 201
+    res.status(201).json(user);
   } catch (error) {
     if (error.code === 11000) {
       res
-        .status(StatusCode.BAD_REQUEST)
-        .json({ message: `${capitalize(Object.keys(error.keyValue)[0])} già esistente` }); //COMMENT: 400
+        .status(400)
+        .json({ message: `${capitalize(Object.keys(error.keyValue)[0])} già esistente` });
       return;
     }
 
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: error.message }); //COMMENT: 500
+    res.status(500).json({ message: error.message });
   }
 });
 

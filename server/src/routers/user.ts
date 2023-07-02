@@ -1,6 +1,5 @@
 import express, { type Request, Response } from "express";
 import User from "../models/user";
-import StatusCodes from "http-status-codes";
 import Playlist from "../models/playlist";
 
 import { isValidObjectId } from "mongoose";
@@ -15,43 +14,13 @@ router.get("/:id", checkIds, async (req: Request, res: Response) => {
     const user = await User.findOne({ _id: id });
 
     if (!user) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
+      res.status(404).json({ message: "Utente non trovato" });
       return;
     }
 
-    res.status(StatusCodes.OK).json(user); //COMMENT: 200
+    res.status(200).json(user);
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
-  }
-});
-
-router.delete("/:id", checkIds, async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  if (!id) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non fornito" }); //COMMENT: 400
-    return;
-  }
-  if (!isValidObjectId(id)) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non valido" }); //COMMENT: 400
-    return;
-  }
-
-  try {
-    const deletedUser = await User.deleteOne({ _id: id });
-
-    if (deletedUser.deletedCount === 0) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
-      return;
-    }
-
-    res.status(StatusCodes.OK).json(deletedUser); //COMMENT: 200
-  } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
   }
 });
 
@@ -68,7 +37,7 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
     !preferredArtists &&
     !description
   ) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "Nessun campo da modificare" }); //COMMENT: 400
+    res.status(400).json({ message: "Nessun campo da modificare" });
     return;
   }
 
@@ -76,7 +45,7 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
     const user = await User.findOne({ _id: id });
 
     if (!user) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
+      res.status(404).json({ message: "Utente non trovato" });
       return;
     }
 
@@ -87,18 +56,42 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
     );
 
     if (!updatedUser) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
+      res.status(404).json({ message: "Utente non trovato" });
       return;
     }
 
     await updatedUser.save();
 
-    res.status(StatusCodes.OK).json(updatedUser); //COMMENT: 200
+    res.status(200).json(updatedUser);
   } catch (error) {
     console.log(error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
+  }
+});
+
+router.delete("/:id", checkIds, async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!id) {
+    res.status(400).json({ message: "ID utente non fornito" });
+    return;
+  }
+  if (!isValidObjectId(id)) {
+    res.status(400).json({ message: "ID utente non valido" });
+    return;
+  }
+
+  try {
+    const deletedUser = await User.deleteOne({ _id: id });
+
+    if (deletedUser.deletedCount === 0) {
+      res.status(404).json({ message: "Utente non trovato" });
+      return;
+    }
+
+    res.status(200).json(deletedUser);
+  } catch (error) {
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
   }
 });
 
@@ -109,9 +102,7 @@ router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) =
     const userPlaylists = await Playlist.find({ userId });
 
     if (!userPlaylists) {
-      res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Nessuna playlist trovata per questo utente" }); //COMMENT: 404
+      res.status(404).json({ message: "Nessuna playlist trovata per questo utente" });
       return;
     }
 
@@ -139,7 +130,7 @@ router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) =
     }));
 
     if (!savedPlaylists.length) {
-      res.status(StatusCodes.OK).json(mappedUserPlaylists); //COMMENT: 200
+      res.status(200).json(mappedUserPlaylists);
       return;
     } else {
       const mappedSavedPlaylists = savedPlaylists.map(p => ({
@@ -157,16 +148,14 @@ router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) =
         isPublic: p.isPublic,
       }));
 
-      res.status(StatusCodes.OK).json({
+      res.status(200).json({
         userPlaylists: mappedUserPlaylists,
         savedPlaylists: mappedSavedPlaylists,
-      }); //COMMENT: 200
+      });
       return;
     }
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
   }
 });
 
@@ -174,20 +163,20 @@ router.post("/save-playlist", async (req: Request, res: Response) => {
   const { userId, playlistId } = req.body;
 
   if (!userId) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non fornito" }); //COMMENT: 400
+    res.status(400).json({ message: "ID utente non fornito" });
     return;
   }
   if (!playlistId) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID playlist non fornito" }); //COMMENT: 400
+    res.status(400).json({ message: "ID playlist non fornito" });
     return;
   }
 
   if (!isValidObjectId(userId)) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID utente non valido" }); //COMMENT: 400
+    res.status(400).json({ message: "ID utente non valido" });
     return;
   }
   if (!isValidObjectId(playlistId)) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "ID playlist non valido" }); //COMMENT: 400
+    res.status(400).json({ message: "ID playlist non valido" });
     return;
   }
 
@@ -200,9 +189,7 @@ router.post("/save-playlist", async (req: Request, res: Response) => {
     }).count();
 
     if (isPlaylistSaved > 0) {
-      res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Hai già salvato questa playlist" }); //COMMENT: 400
+      res.status(400).json({ message: "Hai già salvato questa playlist" });
       return;
     }
 
@@ -213,15 +200,13 @@ router.post("/save-playlist", async (req: Request, res: Response) => {
     );
 
     if (!updatedUser) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Utente non trovato" }); //COMMENT: 404
+      res.status(404).json({ message: "Utente non trovato" });
       return;
     }
 
-    res.status(StatusCodes.OK).json({ message: "Playlist salvata correttamente" }); //COMMENT: 200
+    res.status(200).json({ message: "Playlist salvata correttamente" });
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
   }
 });
 
