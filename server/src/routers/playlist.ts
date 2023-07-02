@@ -1,5 +1,4 @@
 import express, { type Request, Response } from "express";
-import StatusCodes from "http-status-codes";
 import Playlist from "../models/playlist";
 import { ObjectId } from "mongodb";
 import { checkIds } from "../middlewares";
@@ -18,11 +17,11 @@ router.get("/:userId", checkIds, async (req: Request, res: Response) => {
     });
 
     if (!playlists) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Nessuna playlist trovata" }); //COMMENT: 404
+      res.status(404).json({ message: "Nessuna playlist trovata" });
       return;
     }
 
-    res.status(StatusCodes.OK).json(
+    res.status(200).json(
       playlists.map(p => ({
         id: p._id,
         title: p.title,
@@ -37,12 +36,38 @@ router.get("/:userId", checkIds, async (req: Request, res: Response) => {
         duration: p.tracks.reduce((acc, curr) => acc + curr.duration, 0),
         isPublic: p.isPublic,
       }))
-    ); //COMMENT: 200
+    );
   } catch (error) {
     console.error(error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
+  }
+});
+
+router.get("/:id/:userId", checkIds, async (req: Request, res: Response) => {
+  const { id, userId } = req.params;
+
+  try {
+    const playlist = await Playlist.findById(id);
+
+    if (!playlist) {
+      res.status(404).json({ message: "Playlist non trovata" });
+      return;
+    }
+
+    if (playlist.userId.toString() !== userId) {
+      res.status(403).json({ message: "Non autorizzato" });
+      return;
+    }
+
+    res.status(200).json({
+      title: playlist.title,
+      description: playlist.description,
+      tags: playlist.tags,
+      tracks: playlist.tracks,
+      isPublic: playlist.isPublic,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
   }
 });
 
@@ -50,7 +75,7 @@ router.post("/", async (req: Request, res: Response) => {
   const { userId, title, description, tags, tracks, genres, isPublic } = req.body;
 
   if (!userId || !title || !description || !tags || !tracks || !genres) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "Dati mancanti" }); //COMMENT: 400
+    res.status(400).json({ message: "Dati mancanti" });
     return;
   }
 
@@ -66,67 +91,14 @@ router.post("/", async (req: Request, res: Response) => {
     });
     await newPlaylist.save();
 
-    res.status(StatusCodes.CREATED).json(newPlaylist); //COMMENT: 201
+    res.status(201).json(newPlaylist);
   } catch (error) {
     if (error.code === 11000) {
-      res
-        .status(StatusCodes.CONFLICT)
-        .json({ message: "Esiste già una tua playlist con questo titolo" }); //COMMENT: 409
+      res.status(409).json({ message: "Esiste già una tua playlist con questo titolo" });
       return;
     }
 
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
-  }
-});
-
-router.get("/:id/:userId", checkIds, async (req: Request, res: Response) => {
-  const { id, userId } = req.params;
-
-  try {
-    const playlist = await Playlist.findById(id);
-
-    if (!playlist) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Playlist non trovata" }); //COMMENT: 404
-      return;
-    }
-
-    if (playlist.userId.toString() !== userId) {
-      res.status(StatusCodes.FORBIDDEN).json({ message: "Non autorizzato" }); //COMMENT: 403
-      return;
-    }
-
-    res.status(StatusCodes.OK).json({
-      title: playlist.title,
-      description: playlist.description,
-      tags: playlist.tags,
-      tracks: playlist.tracks,
-      isPublic: playlist.isPublic,
-    }); //COMMENT: 200
-  } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
-  }
-});
-
-router.delete("/:id", checkIds, async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  try {
-    const deletedPlaylist = await Playlist.deleteOne({ _id: id });
-
-    if (deletedPlaylist.deletedCount === 0) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Playlist non trovata" }); //COMMENT: 404
-      return;
-    }
-
-    res.status(StatusCodes.OK).json(deletedPlaylist); //COMMENT: 200
-  } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
   }
 });
 
@@ -135,7 +107,7 @@ router.put("/:id/:userId", checkIds, async (req: Request, res: Response) => {
   const { title, description, tags, tracks, genres, isPublic } = req.body;
 
   if (!title && !description && !tags && !tracks && !genres && !isPublic) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: "Nessun campo da modificare" }); //COMMENT: 400
+    res.status(400).json({ message: "Nessun campo da modificare" });
     return;
   }
 
@@ -143,12 +115,12 @@ router.put("/:id/:userId", checkIds, async (req: Request, res: Response) => {
     const playlist = await Playlist.findById(id);
 
     if (!playlist) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Playlist non trovata" }); //COMMENT: 404
+      res.status(404).json({ message: "Playlist non trovata" });
       return;
     }
 
     if (playlist.userId.toString() !== userId) {
-      res.status(StatusCodes.FORBIDDEN).json({ message: "Non autorizzato" }); //COMMENT: 403
+      res.status(403).json({ message: "Non autorizzato" });
       return;
     }
 
@@ -168,22 +140,35 @@ router.put("/:id/:userId", checkIds, async (req: Request, res: Response) => {
     );
 
     if (!updatedPlaylist) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "Playlist non trovata" }); //COMMENT: 404
+      res.status(404).json({ message: "Playlist non trovata" });
       return;
     }
 
-    res.status(StatusCodes.OK).json(updatedPlaylist); //COMMENT: 200
+    res.status(200).json(updatedPlaylist);
   } catch (error) {
     if (error.code === 11000) {
-      res
-        .status(StatusCodes.CONFLICT)
-        .json({ message: "Esiste già una tua playlist con questo titolo" }); //COMMENT: 409
+      res.status(409).json({ message: "Esiste già una tua playlist con questo titolo" });
       return;
     }
 
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "Errore interno, riprovare più tardi" }); //COMMENT: 500
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
+  }
+});
+
+router.delete("/:id", checkIds, async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const deletedPlaylist = await Playlist.deleteOne({ _id: id });
+
+    if (deletedPlaylist.deletedCount === 0) {
+      res.status(404).json({ message: "Playlist non trovata" });
+      return;
+    }
+
+    res.status(200).json(deletedPlaylist);
+  } catch (error) {
+    res.status(500).json({ message: "Errore interno, riprovare più tardi" });
   }
 });
 
