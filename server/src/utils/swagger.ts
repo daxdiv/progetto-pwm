@@ -9,4 +9,4 @@ const swaggerDoc = {
   host: "localhost:3001",
 };
 
-swaggerAutogen()("./swagger-output.json", "./src/index.ts", swaggerDoc);
+swaggerAutogen()("./swagger-output.json", ["./src/index.ts"], swaggerDoc);
