@@ -1,0 +1,505 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Progetto finale Programmazione Web e Mobile - Social Network for Music (SNM)",
+    "description": "Documentazione delle API del progetto finale di Programmazione Web e Mobile",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3001",
+  "basePath": "/",
+  "schemes": ["http"],
+  "paths": {
+    "/auth/access-token": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Restituisce un token di accesso per Spotify",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Token ottenuto con successo"
+          },
+          "500": {
+            "description": "Errore lato server oppure variabile d'ambiente mancante/i"
+          }
+        }
+      }
+    },
+    "/auth/sign-in": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "email@email.com"
+                },
+                "password": {
+                  "example": "password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login effettuato con successo"
+          },
+          "400": {
+            "description": "Email non nel formato corretto"
+          },
+          "401": {
+            "description": "Password errata"
+          },
+          "404": {
+            "description": "Nessun utente trovato con questa email"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
+    "/auth/sign-up": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Registrazione utente",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "username"
+                },
+                "email": {
+                  "example": "email@email.com"
+                },
+                "password": {
+                  "example": "password"
+                },
+                "preferredGenres": {
+                  "type": "array",
+                  "example": ["Pop", "Rock"]
+                },
+                "preferredArtists": {
+                  "type": "array",
+                  "example": ["Tedua", "Travis Scott"]
+                },
+                "description": {
+                  "example": "Descrizione profilo"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Utente registrato con successo"
+          },
+          "400": {
+            "description": "Email non nel formato corretto, username/email già in uso"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Restituisce un utente dato il suo ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utente trovato con successo"
+          },
+          "404": {
+            "description": "Utente non trovato"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Modifica un utente dato il suo ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "username"
+                },
+                "email": {
+                  "example": "email@email.com"
+                },
+                "password": {
+                  "example": "password"
+                },
+                "preferredGenres": {
+                  "type": "array",
+                  "example": ["Pop", "Rock"]
+                },
+                "preferredArtists": {
+                  "type": "array",
+                  "example": ["Tedua", "Travis Scott"]
+                },
+                "description": {
+                  "example": "Descrizione profilo"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utente aggiornato con successo"
+          },
+          "400": {
+            "description": "Nessun campo da modificare"
+          },
+          "404": {
+            "description": "Utente non trovato"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Elimina un utente dato il suo ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utente eliminato con successo"
+          },
+          "400": {
+            "description": "ID fornito non valido o non fornito"
+          },
+          "404": {
+            "description": "Utente non trovato"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
+    "/user/{userId}/playlists": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Restituisce le playlist create da un utente dato il suo ID, e quelle da lui salvate",
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist trovate con successo"
+          },
+          "404": {
+            "description": "Nessuna playlist trovata per l'utente"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
+    "/user/save-playlist": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Salva una playlist",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "playlistId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist salvata con successo"
+          },
+          "400": {
+            "description": "ID/userID fornito non valido o non fornito, playlist già salvata"
+          },
+          "404": {
+            "description": "Utente non trovato"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
+    "/playlist/{userId}": {
+      "get": {
+        "tags": ["Playlist"],
+        "summary": "Restituisce le playlist create da un utente dato il suo ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist trovata/e con successo"
+          },
+          "404": {
+            "description": "Nessuna playlist trovata per l'utente"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
+    "/playlist/{id}/{userId}": {
+      "get": {
+        "tags": ["Playlist"],
+        "summary": "Restituisce una playlist dato il suo ID e l'ID dell'utente che la richiede, se l'id di quest'ultimo corrisponde a quello dell'utente che l'ha creata",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist trovata con successo"
+          },
+          "403": {
+            "description": "L'utente non è autorizzato a visualizzare la playlist"
+          },
+          "404": {
+            "description": "Nessuna playlist trovata con l'id fornito"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Playlist"],
+        "summary": "Modifica una playlist dato il suo ID e l'ID dell'utente che la richiede, se l'id di quest'ultimo corrisponde a quello dell'utente che l'ha creata",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "Titolo"
+                },
+                "description": {
+                  "example": "Descrizione playlist"
+                },
+                "tags": {
+                  "type": "array",
+                  "example": ["bella", "rilassante"]
+                },
+                "tracks": {
+                  "type": "array",
+                  "example": ["track1", "track2"]
+                },
+                "genres": {
+                  "type": "array",
+                  "example": ["Pop", "Rock"]
+                },
+                "isPublic": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist modificata con successo"
+          },
+          "400": {
+            "description": "Nessun campo da modificare"
+          },
+          "403": {
+            "description": "L'utente non è autorizzato a modificare la playlist"
+          },
+          "404": {
+            "description": "Nessuna playlist trovata con l'id fornito"
+          },
+          "409": {
+            "description": "Esiste già una playlist con lo stesso titolo, creata dallo stesso utente"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
+    "/playlist/": {
+      "post": {
+        "tags": ["Playlist"],
+        "summary": "Crea una nuova playlist",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "id"
+                },
+                "title": {
+                  "example": "Titolo playlist"
+                },
+                "description": {
+                  "example": "Descrizione playlist"
+                },
+                "tags": {
+                  "type": "array",
+                  "example": ["bella", "rilassante"]
+                },
+                "tracks": {
+                  "type": "array",
+                  "example": ["track1", "track2"]
+                },
+                "genres": {
+                  "type": "array",
+                  "example": ["Pop", "Rock"]
+                },
+                "isPublic": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Playlist creata con successo"
+          },
+          "400": {
+            "description": "Dati mancanti"
+          },
+          "409": {
+            "description": "Esiste già una playlist con lo stesso titolo, creata dallo stesso utente"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
+    "/playlist/{id}": {
+      "delete": {
+        "tags": ["Playlist"],
+        "summary": "Elimina una playlist dato il suo ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist eliminata con successo"
+          },
+          "404": {
+            "description": "Nessuna playlist trovata con l'id fornito"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    }
+  }
+}

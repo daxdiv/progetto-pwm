@@ -6,7 +6,7 @@ import authRouter from "./routers/auth";
 import userRouter from "./routers/user";
 import playlistRouter from "./routers/playlist";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "./utils/swagger-output.json";
+import swaggerDocument from "./swagger-doc.json";
 
 dotenv.config();
 
