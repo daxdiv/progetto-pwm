@@ -84,7 +84,11 @@ function App() {
         />
         <Route
           path="/playlist/browse"
-          element={<BrowsePlaylists />}
+          element={
+            <Protected>
+              <BrowsePlaylists />
+            </Protected>
+          }
         />
       </Routes>
     </>
