@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { AiOutlineSearch } from "react-icons/ai";
 import AsyncSelect from "react-select/async";
@@ -132,10 +132,6 @@ function SignUp() {
   };
 
   const debounced = debounce(loadOptionsCb, 700);
-
-  useEffect(() => {
-    console.log(selectedArtists);
-  }, [selectedArtists]);
 
   return (
     <>
