@@ -3,7 +3,11 @@
   "info": {
     "title": "Progetto finale Programmazione Web e Mobile - Social Network for Music (SNM)",
     "description": "Documentazione delle API del progetto finale di Programmazione Web e Mobile",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "contact": {
+      "name": "David Larosa",
+      "email": "david.larosa@studenti.unimi.it"
+    }
   },
   "host": "localhost:3001",
   "basePath": "/",
@@ -131,6 +135,9 @@
           "200": {
             "description": "Utente trovato con successo"
           },
+          "400": {
+            "description": "ID fornito non valido o non fornito"
+          },
           "404": {
             "description": "Utente non trovato"
           },
@@ -185,7 +192,7 @@
             "description": "Utente aggiornato con successo"
           },
           "400": {
-            "description": "Nessun campo da modificare"
+            "description": "Nessun campo da modificare, ID fornito non valido o non fornito"
           },
           "404": {
             "description": "Utente non trovato"
@@ -239,6 +246,9 @@
         "responses": {
           "200": {
             "description": "Playlist trovate con successo"
+          },
+          "400": {
+            "description": "ID fornito non valido o non fornito"
           },
           "404": {
             "description": "Nessuna playlist trovata per l'utente"
@@ -304,6 +314,9 @@
           "200": {
             "description": "Playlist trovata/e con successo"
           },
+          "400": {
+            "description": "ID fornito non valido o non fornito"
+          },
           "404": {
             "description": "Nessuna playlist trovata per l'utente"
           },
@@ -335,6 +348,9 @@
         "responses": {
           "200": {
             "description": "Playlist trovata con successo"
+          },
+          "400": {
+            "description": "ID forniti non validi o non forniti"
           },
           "403": {
             "description": "L'utente non è autorizzato a visualizzare la playlist"
@@ -401,7 +417,7 @@
             "description": "Playlist modificata con successo"
           },
           "400": {
-            "description": "Nessun campo da modificare"
+            "description": "Nessun campo da modificare, ID forniti non validi o non forniti"
           },
           "403": {
             "description": "L'utente non è autorizzato a modificare la playlist"
@@ -491,6 +507,9 @@
         "responses": {
           "200": {
             "description": "Playlist eliminata con successo"
+          },
+          "400": {
+            "description": "ID fornito non valido o non fornito"
           },
           "404": {
             "description": "Nessuna playlist trovata con l'id fornito"
