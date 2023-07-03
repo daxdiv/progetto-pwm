@@ -11,9 +11,12 @@ const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const url = "https://accounts.spotify.com/api/token";
 
+/**
+ * Ottenimento dell'access token per le richieste alle API di Spotify
+ */
 router.get("/access-token", async (_req: Request, res: Response) => {
   if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET) {
-    res.status(500).send("CLIENT_ID o CLIENT_SECRET mancanti");
+    res.status(500).send("SPOTIFY_CLIENT_ID o SPOTIFY_CLIENT_SECRET mancanti");
     return;
   }
 
@@ -36,6 +39,9 @@ router.get("/access-token", async (_req: Request, res: Response) => {
   }
 });
 
+/**
+ * Login utente (email e password)
+ */
 router.post("/sign-in", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -68,6 +74,9 @@ router.post("/sign-in", async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Registrazione utente (username, email, password, generi preferiti, artisti preferiti, descrizione utente)
+ */
 router.post("/sign-up", async (req: Request, res: Response) => {
   const { username, email, password, preferredGenres, preferredArtists, description } =
     req.body;
@@ -82,7 +91,7 @@ router.post("/sign-up", async (req: Request, res: Response) => {
     const user = new User({
       username,
       email: email.toLowerCase(),
-      password: password.toLowerCase(),
+      password,
       preferredGenres,
       preferredArtists,
       description,

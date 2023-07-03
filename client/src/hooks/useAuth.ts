@@ -10,6 +10,9 @@ type Auth = {
   savedPlaylists: string[];
 };
 
+/**
+ * Hook che restituisce i dati dell'utente loggato, se non loggato reindirizza alla pagina di login
+ */
 export default function useAuth() {
   const navigate = useNavigate();
   const userDataString = localStorage.getItem("user");

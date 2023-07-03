@@ -15,6 +15,10 @@ type TrackResponse = {
   duration_ms: number;
 };
 
+/**
+ * Hook che restituisce le tracce ottenute da Spotify, per semplificarne la gestione ne vengono restituite solo 50
+ * e solo dal mercato italiano
+ */
 export default function useTracks() {
   const {
     data: fetchedTracks,

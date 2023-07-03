@@ -11,6 +11,12 @@ type UserData = {
   savedPlaylists?: string[];
 };
 
+/**
+ * Hook che restituisce i dati di un utente dal db
+ * @param userId id dell'utente
+ * @param options opzioni per la query, le stesse di react-query
+ * @see https://tanstack.com/query/v4/docs/react/reference/useQuery
+ */
 export default function useUser(
   userId: string,
   options?: UseQueryOptions<UserData, Error, UserData>
