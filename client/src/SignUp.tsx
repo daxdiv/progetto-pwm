@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { AiOutlineSearch } from "react-icons/ai";
 import AsyncSelect from "react-select/async";
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
@@ -130,7 +131,7 @@ function SignUp() {
     cb(artists);
   };
 
-  const debounced = debounce(loadOptionsCb, 500);
+  const debounced = debounce(loadOptionsCb, 700);
 
   useEffect(() => {
     console.log(selectedArtists);
@@ -175,7 +176,13 @@ function SignUp() {
                 className="text-xs w-56"
                 styles={multiSelectStylesConfig}
                 placeholder="Cerca i tuoi artisti preferiti"
-                noOptionsMessage={() => "Nessun artista trovato"}
+                noOptionsMessage={() => "Nessun artista trovato, digita per cercare"}
+                components={{
+                  DropdownIndicator: () => (
+                    <AiOutlineSearch className="text-emerald-600 text-lg mr-2" />
+                  ),
+                  IndicatorSeparator: () => null,
+                }}
                 loadingMessage={() => "Caricamento..."}
                 onChange={selected => {
                   setSelectedArtists(

@@ -78,7 +78,6 @@ function NewPlaylist() {
     setDescription("");
     tagsRef.current.value = "";
     setIsPublic(false);
-    setTracks([]);
   };
 
   return (
