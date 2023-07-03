@@ -20,6 +20,9 @@ type Playlist = {
   createdAt: string;
 };
 
+/**
+ * Hook che restituisce le playlist pubbliche, create da altri utenti
+ */
 export default function usePublicPlaylists() {
   const auth = useAuth();
   const {

@@ -1,5 +1,8 @@
 import { type StylesConfig } from "react-select";
 
+/**
+ * Configurazione per lo stile dei select (select singola)
+ */
 const selectStylesConfig: StylesConfig = {
   control: provided => ({
     ...provided,
@@ -37,6 +40,9 @@ const selectStylesConfig: StylesConfig = {
   }),
 };
 
+/**
+ * Configurazione per lo stile dei select (select multipla)
+ */
 const multiSelectStylesConfig: StylesConfig = {
   ...selectStylesConfig,
   multiValue: provided => ({

@@ -1,6 +1,9 @@
 import { Navigate } from "react-router-dom";
 import useAuth from "./hooks/useAuth";
 
+/**
+ * Componente che permette di proteggere un percorso, in modo da evitare accessi non autorizzati
+ */
 function Protected({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
 

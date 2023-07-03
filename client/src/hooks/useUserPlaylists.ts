@@ -22,6 +22,11 @@ type Response = {
   savedPlaylists?: Playlist[];
 };
 
+/**
+ * Hook che restituisce le playlist dell'utente
+ * @param userId id dell'utente
+ * @returns le playlist dell'utente
+ */
 export default function useUserPlaylists(userId: string) {
   const { data, isLoading, isRefetching, error } = useQuery<Response, SpotifyApiError>({
     queryKey: ["fetch-user-playlists"],

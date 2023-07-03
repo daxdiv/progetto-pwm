@@ -7,6 +7,9 @@ import { checkIds } from "../middlewares";
 
 const router = express.Router();
 
+/**
+ * Ottenimento dati utente
+ */
 router.get("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -24,6 +27,9 @@ router.get("/:id", checkIds, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Modifica dati utente
+ */
 router.put("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
   const { username, email, password, preferredGenres, preferredArtists, description } =
@@ -69,6 +75,9 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Eliminazione utente
+ */
 router.delete("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -86,6 +95,9 @@ router.delete("/:id", checkIds, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Ottenimento playlist utente, sia quelle create sia quelle salvate
+ */
 router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) => {
   const { userId } = req.params;
 
@@ -150,6 +162,9 @@ router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) =
   }
 });
 
+/**
+ * Salvataggio playlist esterna
+ */
 router.post("/save-playlist", async (req: Request, res: Response) => {
   const { userId, playlistId } = req.body;
 

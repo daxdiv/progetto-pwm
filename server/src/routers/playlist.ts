@@ -5,6 +5,9 @@ import { checkIds } from "../middlewares";
 
 const router = express.Router();
 
+/**
+ * Ottenimento playlist pubbliche di un utente (visualizzate nella pagina Sfoglia playlist -> BrowsePlaylists.tsx)
+ */
 router.get("/:userId", checkIds, async (req: Request, res: Response) => {
   const { userId } = req.params;
 
@@ -43,6 +46,9 @@ router.get("/:userId", checkIds, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Ottenimento dati di una playlist, solo se lo userId corrisponde a quello della playlist
+ */
 router.get("/:id/:userId", checkIds, async (req: Request, res: Response) => {
   const { id, userId } = req.params;
 
@@ -71,6 +77,9 @@ router.get("/:id/:userId", checkIds, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Creazione playlist
+ */
 router.post("/", async (req: Request, res: Response) => {
   const { userId, title, description, tags, tracks, genres, isPublic } = req.body;
 
@@ -102,6 +111,9 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Modifica playlist, solo se lo userId di chi effettua la modifica corrisponde a quello della playlist
+ */
 router.put("/:id/:userId", checkIds, async (req: Request, res: Response) => {
   const { id, userId } = req.params;
   const { title, description, tags, tracks, genres, isPublic } = req.body;
@@ -155,6 +167,9 @@ router.put("/:id/:userId", checkIds, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Eliminazione playlist
+ */
 router.delete("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
 
