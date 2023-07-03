@@ -25,10 +25,6 @@ function Profile() {
   const auth = useAuth();
   const { data, isLoading, isRefetching, error } = useUserPlaylists(auth?._id || "");
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
   useUser(auth?._id || "", {
     onSuccess: data => {
       if (data.preferredGenres) {
@@ -119,6 +115,10 @@ function Profile() {
 
     localStorage.setItem("user", JSON.stringify(data));
     toast.success("Profilo aggiornato correttamente");
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/?success=Logout effettuato correttamente");
   };
   const handleDeleteProfile = async () => {
     if (!auth) {
@@ -245,6 +245,12 @@ function Profile() {
             text="Aggiorna profilo"
             size="sm"
             onClick={handleUpdateProfile}
+          />
+          <Button
+            type="button"
+            text="Logout"
+            size="sm"
+            onClick={handleLogout}
           />
           <Button
             type="button"
