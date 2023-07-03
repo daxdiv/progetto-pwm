@@ -33,17 +33,10 @@ export default function usePublicPlaylists() {
   } = useQuery<Playlist[], Error>({
     queryKey: "fetch-public-playlists",
     queryFn: async () => {
-      if (!auth) {
-        toast.error("Accedi per salvare una playlist");
-        return;
-      }
-
-      const { _id: userId } = auth;
-
       await delay();
 
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/playlist/${userId}`
+        `${import.meta.env.VITE_SERVER_URL}/playlist/${auth?._id || ""}`
       );
       const data = await response.json();
 

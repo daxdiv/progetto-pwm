@@ -133,7 +133,7 @@ router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) =
     }));
 
     if (!savedPlaylists.length) {
-      res.status(200).json(mappedUserPlaylists);
+      res.status(200).json({ userPlaylists: mappedUserPlaylists });
       return;
     } else {
       const mappedSavedPlaylists = savedPlaylists.map(p => ({
