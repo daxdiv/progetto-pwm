@@ -4,6 +4,7 @@ import Playlist from "../models/playlist";
 
 import { isValidObjectId } from "mongoose";
 import { checkIds } from "../middlewares";
+import capitalize from "../utils/capitalize";
 
 const router = express.Router();
 
@@ -70,7 +71,13 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.log(error);
+    if (error.code === 11000) {
+      res
+        .status(400)
+        .json({ message: `${capitalize(Object.keys(error.keyValue)[0])} già esistente` });
+      return;
+    }
+
     res.status(500).json({ message: "Errore interno, riprovare più tardi" });
   }
 });
