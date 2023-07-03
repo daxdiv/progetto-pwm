@@ -72,15 +72,6 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
 router.delete("/:id", checkIds, async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  if (!id) {
-    res.status(400).json({ message: "ID utente non fornito" });
-    return;
-  }
-  if (!isValidObjectId(id)) {
-    res.status(400).json({ message: "ID utente non valido" });
-    return;
-  }
-
   try {
     const deletedUser = await User.deleteOne({ _id: id });
 
