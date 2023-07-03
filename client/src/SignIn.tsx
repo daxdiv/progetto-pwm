@@ -70,14 +70,12 @@ function SignIn() {
     <>
       <CenteredContainer className="flex-col gap-2">
         <Input
-          variant="neutral"
           size="sm"
           placeholder="Email"
           type="email"
           ref={emailRef}
         />
         <Input
-          variant="neutral"
           size="sm"
           placeholder="Password"
           type="password"
@@ -91,7 +89,7 @@ function SignIn() {
           onClick={handleSignIn}
           // className={clsx({ "cursor-not-allowed": isLoading })}
         />
-        <p className="text-sm mt-3">
+        <p className="font-normal md:font-bold lg:font-bold text-sm mt-3">
           Non hai un account?{" "}
           <a
             href="/sign-up"

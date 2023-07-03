@@ -31,7 +31,7 @@ function BrowsePlaylists() {
     <>
       <CenteredContainer className="flex-col gap-2">
         {!error && !isLoading && !isRefetching && (
-          <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-2 mt-12">
+          <h1 className="text-emerald-600 border-b border-b-emerald-600 mb-2 mt-12 text-lg font-normal md:text-xl lg:text-3xl md:font-bold lg:fot-bold">
             Sfoglia playlist pubbliche
           </h1>
         )}
@@ -83,7 +83,7 @@ function BrowsePlaylists() {
               </div>
             </div>
 
-            <div className="flex gap-3 justify-center items-center">
+            <div className="flex flex-col gap-2 md:gap-3 lg:gap-3 justify-center items-center md:flex-row lg:flex-row">
               <label
                 htmlFor="filtro"
                 className="text-xs font-normal"

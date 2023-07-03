@@ -140,21 +140,18 @@ function SignUp() {
     <>
       <CenteredContainer className="flex-col gap-2">
         <Input
-          variant="neutral"
           size="sm"
           placeholder="Username"
           type="text"
           ref={usernameRef}
         />
         <Input
-          variant="neutral"
           size="sm"
           placeholder="Email"
           type="email"
           ref={emailRef}
         />
         <Input
-          variant="neutral"
           size="sm"
           placeholder="Password"
           type="password"
@@ -211,7 +208,7 @@ function SignUp() {
 
         <p className="font-normal justify-start flex text-xs">Qualcosa di te*</p>
         <textarea
-          className="w-1/2 h-40 rounded-xl bg-gray-800 border-2 border-gray-500 text-white text-sm p-2 resize-none"
+          className="w-1/2 h-40 rounded-xl bg-gray-800 font-normal md:font-bold lg:font-bold border md:border-2 lg:border-2 border-gray-500 text-white text-sm p-2 resize-none"
           placeholder="Descrizione"
           value={description}
           onChange={e => setDescription(e.target.value)}
@@ -231,7 +228,7 @@ function SignUp() {
           )}
         />
 
-        <p className="text-sm mt-3">
+        <p className="text-sm mt-3 font-normal md:font-bold lg:font-bold">
           Hai già un account?{" "}
           <a
             href="/"

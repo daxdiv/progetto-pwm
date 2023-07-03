@@ -144,18 +144,16 @@ function Profile() {
   return (
     <>
       <CenteredContainer className="pt-20 flex-col gap-2">
-        <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-4">
+        <h1 className="text-emerald-600 text-lg font-normal md:text-xl lg:text-3xl md:font-bold lg:fot-bold border-b border-b-emerald-600 mb-4">
           Il tuo Profilo
         </h1>
         <Input
-          variant="neutral"
           size="sm"
           placeholder="Nuovo username"
           type="text"
           ref={usernameRef}
         />
         <Input
-          variant="neutral"
           size="sm"
           placeholder="Nuova email"
           type="email"
@@ -165,10 +163,9 @@ function Profile() {
           htmlFor="password"
           className="font-normal text-xs"
         >
-          Inserisci la password per confermare o inseriscine una nuova:
+          Inserisci la password per confermare o una nuova:
         </label>
         <Input
-          variant="neutral"
           size="sm"
           placeholder="Password"
           type="password"
@@ -232,7 +229,7 @@ function Profile() {
 
         <p className="font-normal justify-start flex text-xs">Qualcosa di te*</p>
         <textarea
-          className="w-1/2 h-40 rounded-xl bg-gray-800 text-white text-sm p-2 resize-none border-2 border-gray-500"
+          className="border font-normal md:font-bold lg:font-bold w-1/2 h-40 rounded-xl bg-gray-800 text-white text-sm p-2 resize-none md:border-2 lg:border-2 border-gray-500"
           placeholder="Descrizione"
           value={description}
           onChange={e => setDescription(e.target.value)}
@@ -290,7 +287,7 @@ function Profile() {
               (!data?.userPlaylists || data.userPlaylists.length === 0) && (
                 <div className="flex justify-center items-center">
                   <p className="text-gray-500 text-md font-normal">
-                    Non hai ancora creato nessuna playlist
+                    Nessuna playlist creata
                   </p>
                 </div>
               )}
@@ -318,7 +315,7 @@ function Profile() {
               (!data?.savedPlaylists || data?.savedPlaylists?.length === 0) && (
                 <div className="flex justify-center items-center">
                   <p className="text-gray-500 text-md font-normal">
-                    Non hai ancora salvato nessuna playlist
+                    Nessuna playlist salvata
                   </p>
                 </div>
               )}
