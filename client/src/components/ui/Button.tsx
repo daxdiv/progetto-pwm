@@ -9,7 +9,7 @@ interface Props
 }
 
 const buttonVariants = cva(
-  "bg-emerald-600 enabled:hover:bg-emerald-700 transition-all duration-250 ease-in-out rounded-lg p-2.5 text-sm cursor-pointer",
+  "bg-emerald-600 font-normal md:font-bold lg:font-bold enabled:hover:bg-emerald-700 transition-all duration-250 ease-in-out rounded-lg p-2.5 text-sm cursor-pointer",
   {
     variants: {
       variant: {

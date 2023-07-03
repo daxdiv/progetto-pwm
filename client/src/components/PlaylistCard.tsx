@@ -78,7 +78,7 @@ const PlaylistCard: React.FC<Props> = ({
           "hover:scale-[1.015]": owned,
           "transition-transform": owned,
         },
-        `relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800`
+        `relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800 font-normal md:font-bold lg:font-bold text-xs md:text-sm lg:text-sm`
       )}
       key={playlist.id}
       onClick={() => {
@@ -113,7 +113,7 @@ const PlaylistCard: React.FC<Props> = ({
 
       <div className="flex gap-2">
         <p className="text-md text-emerald-600">
-          Numero di tracce: <span className="text-white">{playlist.tracks.length}</span>
+          Tracce: <span className="text-white">{playlist.tracks.length}</span>
         </p>
       </div>
 
@@ -121,7 +121,7 @@ const PlaylistCard: React.FC<Props> = ({
         {playlist.genres.slice(0, 5).map((genre, index) => (
           <span
             key={`${genre}-${index}`}
-            className="text-xs text-white bg-gray-700 rounded-md px-2 py-1"
+            className="truncate text-xs text-white bg-gray-700 rounded-md px-2 py-1"
           >
             {genre}
           </span>
@@ -138,7 +138,7 @@ const PlaylistCard: React.FC<Props> = ({
         {playlist.tags.slice(0, 5).map((tag, index) => (
           <span
             key={`${tag}-${index}`}
-            className="text-sm text-white bg-gray-700 rounded-md px-2 py-1"
+            className="truncate text-sm text-white bg-gray-700 rounded-md px-2 py-1"
           >
             <span className="text-emerald-600">#</span>
             {tag}
@@ -179,8 +179,8 @@ const PlaylistCard: React.FC<Props> = ({
         </>
       )}
 
-      <div className="absolute bottom-1 right-1 flex flex-row gap-2 text-xs text-gray-500">
-        Creata il: {formatDate(new Date(playlist.createdAt))}
+      <div className="absolute font-normal md:font-bold lg:font-bold bottom-1 right-1 flex flex-row gap-2 text-xs text-gray-500">
+        {formatDate(new Date(playlist.createdAt))}
       </div>
     </div>
   );

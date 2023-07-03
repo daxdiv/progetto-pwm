@@ -96,7 +96,7 @@ function NewPlaylist() {
       )}
 
       {!error && (
-        <h1 className="text-emerald-600 text-3xl border-b border-b-emerald-600 mb-4">
+        <h1 className="text-emerald-600 text-lg font-normal md:text-xl lg:text-3xl md:font-bold lg:fot-bold border-b border-b-emerald-600 mb-4">
           Crea una nuova playlist
         </h1>
       )}
@@ -183,14 +183,13 @@ function NewPlaylist() {
             />
           )}
           <Input
-            variant="neutral"
             size="sm"
             placeholder="Nome playlist"
             type="text"
             ref={titleRef}
           />
           <textarea
-            className="outline-none focus:border-emerald-600 w-56 h-40 rounded-xl bg-gray-800 text-white text-sm p-2 resize-none border-2 border-gray-500 placeholder:text-gray-500"
+            className="outline-none focus:border-emerald-600 font-normal border md:font-bold lg:font-bold -56 h-40 rounded-xl bg-gray-800 text-white text-sm p-2 resize-none md:border-2 lg:border-2 border-gray-500 placeholder:text-gray-500"
             placeholder="Descrizione playlist"
             value={description}
             onChange={e => setDescription(e.target.value)}
@@ -200,7 +199,6 @@ function NewPlaylist() {
             Inserisci uno o più tag descrittivi, separati da spazi
           </p>
           <Input
-            variant="neutral"
             size="sm"
             placeholder="Tag playlist"
             type="text"
