@@ -2,6 +2,7 @@ import { formatDate, formatDuration } from "../utils/helpers";
 
 import { BiSolidLock } from "react-icons/bi";
 import { FaFileImport } from "react-icons/fa";
+import { ImCross } from "react-icons/im";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
@@ -27,6 +28,8 @@ type Props = {
   owned?: boolean;
   saveable?: boolean;
   extended?: boolean;
+  canUnSave?: boolean;
+  onUnSave?: () => void;
 };
 
 const PlaylistCard: React.FC<Props> = ({
@@ -34,6 +37,9 @@ const PlaylistCard: React.FC<Props> = ({
   owned = false,
   saveable = false,
   extended = false,
+  canUnSave = false,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onUnSave = () => {},
 }) => {
   const navigate = useNavigate();
   const auth = useAuth();
@@ -69,6 +75,33 @@ const PlaylistCard: React.FC<Props> = ({
 
     toast.success(data.message);
   };
+  const handleUnSavePlaylist = async (playlistId: string) => {
+    if (!auth) {
+      toast.error("Devi aver fatto l'accesso per salvare una playlist");
+      return;
+    }
+
+    const { _id: userId } = auth;
+
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/user/un-save-playlist/${userId}/${playlistId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      toast.error(data.message);
+      return;
+    }
+
+    toast.success(data.message);
+  };
 
   return (
     <div
@@ -78,7 +111,7 @@ const PlaylistCard: React.FC<Props> = ({
           "hover:scale-[1.015]": owned,
           "transition-transform": owned,
         },
-        `relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800 font-normal md:font-bold lg:font-bold text-xs md:text-sm lg:text-sm w-auto md:w-60 lg:w-60`
+        `relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800 font-normal md:font-bold lg:font-bold text-xs md:text-sm lg:text-sm w-auto md:w-70 lg:w-70`
       )}
       key={playlist.id}
       onClick={() => {
@@ -107,6 +140,19 @@ const PlaylistCard: React.FC<Props> = ({
             className="text-emerald-600 cursor-pointer active:text-emerald-500 hover:text-emerald-500"
             alt="Salva playlist"
             onClick={() => handleSavePlaylist(playlist.id)}
+          />
+        </div>
+      )}
+
+      {canUnSave && (
+        <div className="absolute top-2 right-2 flex flex-row gap-2">
+          <ImCross
+            className="text-red-500 cursor-pointer active:text-red-600 hover:text-red-600"
+            alt="Rimuovi playlist salvata"
+            onClick={() => {
+              handleUnSavePlaylist(playlist.id);
+              onUnSave();
+            }}
           />
         </div>
       )}
