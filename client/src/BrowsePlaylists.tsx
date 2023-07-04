@@ -120,51 +120,51 @@ function BrowsePlaylists() {
           </>
         )}
 
-        {!error &&
-          !isLoading &&
-          !isRefetching &&
-          playlists &&
-          playlists
-            .sort((p1, p2) => {
-              const date1 = new Date(p1.createdAt);
-              const date2 = new Date(p2.createdAt);
-
-              if (sortDateAsc) {
-                return date1.getTime() - date2.getTime();
-              } else {
-                return date2.getTime() - date1.getTime();
-              }
-            })
-            .filter(p => {
-              if (!searchValue) return true;
-
-              switch (filterCriteria) {
-                case "track-name":
-                  return p.tracks.some(t =>
-                    t.name.toLowerCase().startsWith(searchValue.toLowerCase())
-                  );
-                case "tags":
-                  return p.tags.some(t =>
-                    t.toLowerCase().startsWith(searchValue.toLowerCase())
-                  );
-                case "artist":
-                  return p.tracks.some(t =>
-                    t.artists.some(a =>
-                      a.toLowerCase().startsWith(searchValue.toLowerCase())
-                    )
-                  );
-                default:
-                  return true;
-              }
-            })
-            .map(p => (
-              <PlaylistCard
-                key={p.id}
-                playlist={p}
-                saveable
-                extended
-              />
-            ))}
+        <div className="flex flex-col mt-3 gap-2 md:grid md:grid-cols-3 lg:grid lg:grid-cols-3">
+          {!error &&
+            !isLoading &&
+            !isRefetching &&
+            playlists &&
+            playlists
+              .sort((p1, p2) => {
+                const date1 = new Date(p1.createdAt);
+                const date2 = new Date(p2.createdAt);
+                if (sortDateAsc) {
+                  return date1.getTime() - date2.getTime();
+                } else {
+                  return date2.getTime() - date1.getTime();
+                }
+              })
+              .filter(p => {
+                if (!searchValue) return true;
+                switch (filterCriteria) {
+                  case "track-name":
+                    return p.tracks.some(t =>
+                      t.name.toLowerCase().startsWith(searchValue.toLowerCase())
+                    );
+                  case "tags":
+                    return p.tags.some(t =>
+                      t.toLowerCase().startsWith(searchValue.toLowerCase())
+                    );
+                  case "artist":
+                    return p.tracks.some(t =>
+                      t.artists.some(a =>
+                        a.toLowerCase().startsWith(searchValue.toLowerCase())
+                      )
+                    );
+                  default:
+                    return true;
+                }
+              })
+              .map(p => (
+                <PlaylistCard
+                  key={p.id}
+                  playlist={p}
+                  saveable
+                  extended
+                />
+              ))}
+        </div>
       </CenteredContainer>
     </>
   );

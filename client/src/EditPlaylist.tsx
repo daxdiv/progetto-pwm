@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { AiOutlineSearch } from "react-icons/ai";
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
 import Select from "react-select";
 import Toggle from "react-toggle";
-import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
 import { multiSelectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
@@ -20,6 +20,7 @@ type Track = {
 };
 
 function EditPlaylist() {
+  const [inputValue, setInputValue] = useState("");
   const [oldTracks, setOldTracks] = useState<Track[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [playlistGenres, setPlaylistGenres] = useState<Set<string>>(new Set());
@@ -29,7 +30,7 @@ function EditPlaylist() {
   const [isPublic, setIsPublic] = useState(false);
   const { id: playlistId } = useParams();
   const navigate = useNavigate();
-  const { fetchedTracks, isLoading, isRefetching, error } = useTracks();
+  const { fetchedTracks, isLoading, isRefetching, error } = useTracks(inputValue);
 
   useEffect(() => {
     const userDataString = localStorage.getItem("user");
@@ -172,7 +173,7 @@ function EditPlaylist() {
         </h1>
       )}
 
-      {!error && !isLoading && !isRefetching && oldTracks.length > 0 && (
+      {!error && oldTracks.length > 0 && (
         <div className="flex items-start gap-2">
           <p className="font-normal text-xs">Canzoni già presenti in playlist:</p>
           <p className="font-normal text-xs">{oldTracks.length}</p>
@@ -180,8 +181,6 @@ function EditPlaylist() {
       )}
 
       {!error &&
-        !isLoading &&
-        !isRefetching &&
         oldTracks.map((t, i) => (
           <div
             key={`${t.name}-${i}`}
@@ -200,94 +199,102 @@ function EditPlaylist() {
         ))}
       {!error && (
         <>
-          {isLoading || isRefetching ? (
-            <Triangle
-              height="40"
-              width="40"
-              color="#059669"
-              ariaLabel="triangle-loading"
-              visible={true}
-            />
-          ) : (
-            <Select
-              isMulti
-              isSearchable
-              options={(fetchedTracks || [])
-                .filter(t => {
-                  const isInPlaylist = oldTracks.some(
-                    ot =>
-                      ot.name === t.name &&
-                      // check if artists are the same
-                      (ot.artists?.every(a => t.artists.some(ta => ta.name === a)) ??
-                        true)
-                  );
-
-                  return !isInPlaylist;
-                })
-                .map(t => ({
-                  value: `${t.name}$$${t.artists
-                    .map(a => `${a.name}-${a.id}`)
-                    .join(", ")}$$${t.album.release_date}$$${t.duration_ms}`,
-                  label: `${t.name} - ${t.artists.map(a => a.name).join(", ")}`,
-                }))}
-              placeholder="Seleziona nuove canzoni"
-              className="outline-none"
-              styles={multiSelectStylesConfig}
-              onChange={selected => {
-                setTracks(() =>
-                  selected.map(s => {
-                    const tokens = (s as { value: string }).value.split("$$");
-                    const name = tokens[0];
-                    const artistsData = tokens[1].split(", ");
-                    const artistsNames = artistsData.map(a => a.split("-")[0]);
-                    const artistsIds = artistsData.map(a => a.split("-")[1]);
-                    const releaseDate = tokens[2];
-                    const duration = parseInt(tokens[3]);
-
-                    Promise.all(
-                      artistsIds.map(async id => {
-                        const response = await fetch(
-                          `${import.meta.env.VITE_SPOTIFY_BASE_URL}/artists/${id}`,
-                          {
-                            headers: {
-                              Authorization: `Bearer ${localStorage.getItem(
-                                "access_token"
-                              )}`,
-                            },
-                          }
-                        );
-                        const data = await response.json();
-
-                        if (!response.ok) {
-                          toast.error(data.message);
-                          return;
-                        }
-
-                        return data.genres;
-                      })
-                    ).then(data => {
-                      setPlaylistGenres(() => {
-                        const flattenedData = data.flat();
-
-                        flattenedData.forEach(g => {
-                          playlistGenres.add(g);
-                        });
-
-                        return playlistGenres;
-                      });
-                    });
-
-                    return {
-                      name,
-                      artists: artistsNames,
-                      releaseDate,
-                      duration,
-                    };
-                  })
+          <Select
+            isMulti
+            isSearchable
+            isLoading={isLoading || isRefetching}
+            options={(fetchedTracks || [])
+              .filter(t => {
+                const isInPlaylist = oldTracks.some(
+                  ot =>
+                    ot.name === t.name &&
+                    // check if artists are the same
+                    (ot.artists?.every(a => t.artists.some(ta => ta.name === a)) ?? true)
                 );
-              }}
-            />
-          )}
+
+                return !isInPlaylist;
+              })
+              .map(t => ({
+                value: `${t.name}$$${t.artists
+                  .map(a => `${a.name}-${a.id}`)
+                  .join(", ")}$$${t.album.release_date}$$${t.duration_ms}`,
+                label: `${t.name} - ${t.artists.map(a => a.name).join(", ")}`,
+              }))}
+            placeholder="Seleziona nuove canzoni"
+            className="outline-none w-60"
+            styles={multiSelectStylesConfig}
+            noOptionsMessage={() => "Nessuna canzone trovata, digita per cercare"}
+            loadingMessage={() => "Caricamento..."}
+            components={{
+              DropdownIndicator: () => (
+                <AiOutlineSearch className="text-emerald-600 text-lg mr-2" />
+              ),
+              IndicatorSeparator: () => null,
+            }}
+            onChange={selected => {
+              setTracks(() =>
+                selected.map(s => {
+                  const tokens = (s as { value: string }).value.split("$$");
+                  const name = tokens[0];
+                  const artistsData = tokens[1].split(", ");
+                  const artistsNames = artistsData.map(a => a.split("-")[0]);
+                  const artistsIds = artistsData.map(a => a.split("-")[1]);
+                  const releaseDate = tokens[2];
+                  const duration = parseInt(tokens[3]);
+
+                  Promise.all(
+                    artistsIds.map(async id => {
+                      const response = await fetch(
+                        `${import.meta.env.VITE_SPOTIFY_BASE_URL}/artists/${id}`,
+                        {
+                          headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                              "access_token"
+                            )}`,
+                          },
+                        }
+                      );
+                      const data = await response.json();
+
+                      if (!response.ok) {
+                        toast.error(data.message);
+                        return;
+                      }
+
+                      return data.genres;
+                    })
+                  ).then(data => {
+                    setPlaylistGenres(() => {
+                      const flattenedData = data.flat();
+
+                      flattenedData.forEach(g => {
+                        playlistGenres.add(g);
+                      });
+
+                      return playlistGenres;
+                    });
+                  });
+
+                  return {
+                    name,
+                    artists: artistsNames,
+                    releaseDate,
+                    duration,
+                  };
+                })
+              );
+            }}
+            onInputChange={input => {
+              if (input.length < 3) {
+                return;
+              }
+
+              setTimeout(() => {
+                setInputValue(input);
+                input = inputValue;
+              }, 1000);
+            }}
+          />
           <Input
             size="sm"
             placeholder="Nome playlist"

@@ -1,15 +1,16 @@
 import { useRef, useState } from "react";
 
+import { AiOutlineSearch } from "react-icons/ai";
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
 import Input from "./components/ui/Input";
 import Select from "react-select";
 import Toggle from "react-toggle";
-import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
 import { multiSelectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
 import { truncate } from "./utils/helpers";
+import useAuth from "./hooks/useAuth";
 import useTracks from "./hooks/useTracks";
 
 type Track = {
@@ -20,18 +21,18 @@ type Track = {
 };
 
 function NewPlaylist() {
+  const [inputValue, setInputValue] = useState("");
   const [tracks, setTracks] = useState<Track[]>([]);
   const [playlistGenres, setPlaylistGenres] = useState<Set<string>>(new Set());
   const titleRef = useRef<HTMLInputElement>(null);
   const [description, setDescription] = useState("");
   const tagsRef = useRef<HTMLInputElement>(null);
   const [isPublic, setIsPublic] = useState(false);
-  const { fetchedTracks, isLoading, isRefetching, error } = useTracks();
+  const auth = useAuth();
+  const { fetchedTracks, isLoading, isRefetching, error } = useTracks(inputValue);
 
   const handleCreatePlaylist = async () => {
-    const userDataString = localStorage.getItem("user");
-
-    if (!userDataString) {
+    if (!auth) {
       return;
     }
 
@@ -39,8 +40,7 @@ function NewPlaylist() {
       return;
     }
 
-    const userDataJSON = JSON.parse(userDataString);
-    const { _id: userId } = userDataJSON;
+    const { _id: userId } = auth;
     const title = titleRef.current.value;
     const tags = tagsRef.current.value;
 
@@ -102,85 +102,92 @@ function NewPlaylist() {
 
       {!error && (
         <>
-          {isLoading || isRefetching ? (
-            <Triangle
-              height="40"
-              width="40"
-              color="#059669"
-              ariaLabel="triangle-loading"
-              visible={true}
-            />
-          ) : (
-            <Select
-              isMulti
-              isSearchable
-              options={(fetchedTracks || []).map(t => ({
-                value: `${t.name}$$${t.artists
-                  .map(a => `${a.name}-${a.id}`)
-                  .join(", ")}$$${t.album.release_date}$$${t.duration_ms}`,
-                label: truncate(
-                  `${t.name} - ${t.artists.map(a => a.name).join(", ")}`,
-                  50
-                ),
-              }))}
-              placeholder="Seleziona le canzoni"
-              className="outline-none"
-              styles={multiSelectStylesConfig}
-              onChange={selected => {
-                setTracks(() =>
-                  selected.map(s => {
-                    const tokens = (s as { value: string }).value.split("$$");
-                    const name = tokens[0];
-                    const artistsData = tokens[1].split(", ");
-                    const artistsNames = artistsData.map(a => a.split("-")[0]);
-                    const artistsIds = artistsData.map(a => a.split("-")[1]);
-                    const releaseDate = tokens[2];
-                    const duration = parseInt(tokens[3]);
+          <Select
+            isMulti
+            isSearchable
+            isLoading={isLoading || isRefetching}
+            options={(fetchedTracks || []).map(t => ({
+              value: `${t.name}$$${t.artists.map(a => `${a.name}-${a.id}`).join(", ")}$$${
+                t.album.release_date
+              }$$${t.duration_ms}`,
+              label: truncate(`${t.name} - ${t.artists.map(a => a.name).join(", ")}`, 50),
+            }))}
+            placeholder="Cerca canzoni"
+            className="outline-none w-60"
+            styles={multiSelectStylesConfig}
+            noOptionsMessage={() => "Nessuna canzone trovata, digita per cercare"}
+            loadingMessage={() => "Caricamento..."}
+            components={{
+              DropdownIndicator: () => (
+                <AiOutlineSearch className="text-emerald-600 text-lg mr-2" />
+              ),
+              IndicatorSeparator: () => null,
+            }}
+            onInputChange={input => {
+              if (input.length < 3) {
+                return;
+              }
 
-                    Promise.all(
-                      artistsIds.map(async id => {
-                        const response = await fetch(
-                          `${import.meta.env.VITE_SPOTIFY_BASE_URL}/artists/${id}`,
-                          {
-                            headers: {
-                              Authorization: `Bearer ${localStorage.getItem(
-                                "access_token"
-                              )}`,
-                            },
-                          }
-                        );
-                        const data = await response.json();
+              setTimeout(() => {
+                setInputValue(input);
+                input = inputValue;
+              }, 1000);
+            }}
+            onChange={selected => {
+              setTracks(() =>
+                selected.map(s => {
+                  const tokens = (s as { value: string }).value.split("$$");
+                  const name = tokens[0];
+                  const artistsData = tokens[1].split(", ");
+                  const artistsNames = artistsData.map(a => a.split("-")[0]);
+                  const artistsIds = artistsData.map(a => a.split("-")[1]);
+                  const releaseDate = tokens[2];
+                  const duration = parseInt(tokens[3]);
 
-                        if (!response.ok) {
-                          toast.error(data.message);
-                          return;
+                  Promise.all(
+                    artistsIds.map(async id => {
+                      const response = await fetch(
+                        `${import.meta.env.VITE_SPOTIFY_BASE_URL}/artists/${id}`,
+                        {
+                          headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                              "access_token"
+                            )}`,
+                          },
                         }
+                      );
+                      const data = await response.json();
 
-                        return data.genres;
-                      })
-                    ).then(data => {
-                      setPlaylistGenres(() => {
-                        const flattenedData = data.flat();
+                      if (!response.ok) {
+                        toast.error(data.message);
+                        return;
+                      }
 
-                        flattenedData.forEach(g => {
-                          playlistGenres.add(g);
-                        });
+                      return data.genres;
+                    })
+                  ).then(data => {
+                    setPlaylistGenres(() => {
+                      const flattenedData = data.flat();
 
-                        return playlistGenres;
+                      flattenedData.forEach(g => {
+                        playlistGenres.add(g);
                       });
-                    });
 
-                    return {
-                      name,
-                      artists: artistsNames,
-                      releaseDate,
-                      duration,
-                    };
-                  })
-                );
-              }}
-            />
-          )}
+                      return playlistGenres;
+                    });
+                  });
+
+                  return {
+                    name,
+                    artists: artistsNames,
+                    releaseDate,
+                    duration,
+                  };
+                })
+              );
+            }}
+          />
+
           <Input
             size="sm"
             placeholder="Nome playlist"
