@@ -28,7 +28,10 @@ type Response = {
  * @returns le playlist dell'utente
  */
 export default function useUserPlaylists(userId: string) {
-  const { data, isLoading, isRefetching, error } = useQuery<Response, SpotifyApiError>({
+  const { data, isLoading, isRefetching, error, refetch } = useQuery<
+    Response,
+    SpotifyApiError
+  >({
     queryKey: ["fetch-user-playlists"],
     queryFn: async () => {
       await delay();
@@ -50,5 +53,5 @@ export default function useUserPlaylists(userId: string) {
     },
   });
 
-  return { data, isLoading, isRefetching, error };
+  return { data, isLoading, isRefetching, error, refetch };
 }

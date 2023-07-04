@@ -23,7 +23,9 @@ function Profile() {
   const [description, setDescription] = useState("");
   const [searchParams] = useSearchParams();
   const auth = useAuth();
-  const { data, isLoading, isRefetching, error } = useUserPlaylists(auth?._id || "");
+  const { data, isLoading, isRefetching, error, refetch } = useUserPlaylists(
+    auth?._id || ""
+  );
 
   useUser(auth?._id || "", {
     onSuccess: data => {
@@ -336,6 +338,10 @@ function Profile() {
                 <PlaylistCard
                   playlist={p}
                   key={`saved-${p.id}`}
+                  canUnSave
+                  onUnSave={() => {
+                    refetch();
+                  }}
                 />
               ))}
           </div>
