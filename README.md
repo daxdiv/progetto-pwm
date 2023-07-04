@@ -155,3 +155,5 @@ La verifica della correttezza delle richieste viene fatta sia lato frontend che 
 Durante l'ottenimento delle info di una canzone, quasi mai vengono restituiti i generi musicali che la "compongono".
 Per ovviare questo problema, viene effettuata una richiesta a Spotify per ottenere i generi musicali dell'artista, e vengono restituiti.
 I generi musicali che compongono una canzone vengono ottenuti in base a quelli del/degli artisti che la compongono.
+
+Per non tutte le richieste ho sfruttato le funzionalità di `react-query`, in quanto alcune richieste non necessitano di un caricamento, o non è necessario gestire lo stato di caricamento o errore: in questi casi ho utilizzato la fetch API.
