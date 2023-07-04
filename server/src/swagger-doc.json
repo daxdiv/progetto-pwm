@@ -297,6 +297,41 @@
         }
       }
     },
+    "/user/un-save-playlist": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Rimuove una playlist salvata",
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "playlistId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist rimossa con successo"
+          },
+          "400": {
+            "description": "ID/userID fornito non valido o non fornito, playlist non salvata"
+          },
+          "404": {
+            "description": "Utente non trovato"
+          },
+          "500": {
+            "description": "Errore lato server"
+          }
+        }
+      }
+    },
     "/playlist/{userId}": {
       "get": {
         "tags": ["Playlist"],
