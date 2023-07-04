@@ -51,6 +51,11 @@ Link codice sorgente: https://github.com/daxdiv/progetto-pwm
 Il sito sarà disponibile all'indirizzo http://localhost:5173.
 La documentazione delle API sarà disponibile all'indirizzo http://localhost:3001/api-docs dopo aver avviato il server.
 
+Durante l'esposizione all'interno del db saranno presenti due utenti:
+
+- email: david@david.com, password: david (ha creato due playlist, una pubblica e una privata)
+- email: valerio@bellandi.com, password: valerio (non ha creato playlist, ma ne ha importata una dall'utente sopracitato)
+
 ## Struttura :file_folder:
 
 - `client`: frontend realizzato con [React](https://react.dev) e [Typescript](https://www.typescriptlang.org)
