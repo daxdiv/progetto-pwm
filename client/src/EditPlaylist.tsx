@@ -10,6 +10,7 @@ import Toggle from "react-toggle";
 import clsx from "clsx";
 import { multiSelectStylesConfig } from "./utils/selectStylesConfig";
 import { toast } from "react-hot-toast";
+import useAuth from "./hooks/useAuth";
 import useTracks from "./hooks/useTracks";
 
 type Track = {
@@ -31,6 +32,7 @@ function EditPlaylist() {
   const { id: playlistId } = useParams();
   const navigate = useNavigate();
   const { fetchedTracks, isLoading, isRefetching, error } = useTracks(inputValue);
+  const auth = useAuth();
 
   useEffect(() => {
     const userDataString = localStorage.getItem("user");
@@ -76,24 +78,17 @@ function EditPlaylist() {
       setDescription(description);
       tagsRef.current.value = tags.join(" ");
       setIsPublic(isPublic);
-      setOldTracks(
-        tracks.map((t: Track) => ({
-          name: t.name,
-        }))
-      );
+      setOldTracks(tracks);
     };
 
     fetchPlaylistData();
   }, [navigate, playlistId]);
 
   const handleUpdatePlaylist = async () => {
-    const userDataString = localStorage.getItem("user");
-
-    if (!userDataString) {
+    if (!auth) {
       return;
     }
 
-    const userDataJSON = JSON.parse(userDataString);
     const title = titleRef.current?.value;
     const tags = tagsRef.current?.value.split(" ").map(t => t.trim());
 
@@ -103,7 +98,7 @@ function EditPlaylist() {
     }
 
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/playlist/${playlistId}/${userDataJSON._id}`,
+      `${import.meta.env.VITE_SERVER_URL}/playlist/${playlistId}/${auth?._id}`,
       {
         method: "PUT",
         headers: {
