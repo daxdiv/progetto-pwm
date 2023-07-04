@@ -4,7 +4,7 @@
 
 Il progetto consiste in un'applicazione web per la gestione di playlist musicali. L'applicazione è composta da un frontend e un backend, entrambi scritti in TypeScript. Il frontend è stato sviluppato con React, mentre il backend è stato sviluppato con Express. Il database utilizzato è MongoDB.
 
-Realizzato da **Larosa David (04881A)**
+Realizzato solo da **Larosa David (04881A)**
 
 ## Installazione :wrench:
 
