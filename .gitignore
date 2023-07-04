@@ -1,2 +1,5 @@
-*.pdf
+PWM*.pdf
+SPOTIFY*.pdf
+*.pages
+.DS_Store
 todo.md
