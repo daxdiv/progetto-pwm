@@ -203,7 +203,7 @@ const PlaylistCard: React.FC<Props> = ({
           <div className="mt-3">
             <div>
               <ul className="font-normal text-[.6rem]">
-                {playlist.tracks.map((track, index) => (
+                {playlist.tracks.slice(0, 7).map((track, index) => (
                   <li
                     key={`${track.name}-${index}`}
                     className="py-1"
@@ -216,6 +216,11 @@ const PlaylistCard: React.FC<Props> = ({
                 ))}
               </ul>
             </div>
+            {playlist.tracks.length - 7 >= 1 && (
+              <span className="text-xs text-gray-500">
+                +{playlist.tracks.length - 7} altre
+              </span>
+            )}
           </div>
 
           <div className="text-xs text-gray-500 mt-2">
