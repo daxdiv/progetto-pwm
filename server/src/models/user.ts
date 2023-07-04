@@ -45,8 +45,7 @@ const userSchema = new mongoose.Schema<User>({
 
 userSchema.pre("save", async function (next) {
   try {
-    const salt = await bcrpyt.genSalt(10);
-    const hashedPassword = await bcrpyt.hash(this.password, salt);
+    const hashedPassword = await bcrpyt.hash(this.password, 10);
 
     this.password = hashedPassword;
 
