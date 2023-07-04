@@ -19,21 +19,26 @@ type TrackResponse = {
  * Hook che restituisce le tracce ottenute da Spotify, per semplificarne la gestione ne vengono restituite solo 50
  * e solo dal mercato italiano
  */
-export default function useTracks() {
+export default function useTracks(inputValue: string) {
   const {
     data: fetchedTracks,
     isLoading,
     isRefetching,
     error,
+    refetch,
   } = useQuery<TrackResponse[], SpotifyApiError>({
-    queryKey: ["fetch-tracks"],
+    queryKey: ["fetch-tracks", inputValue],
     queryFn: async () => {
       await delay();
+
+      if (!inputValue) {
+        return [];
+      }
 
       const response = await fetch(
         `${
           import.meta.env.VITE_SPOTIFY_BASE_URL
-        }/search?q=track&type=track&market=IT&limit=50&offset=0`,
+        }/search?q=${inputValue}&type=track&market=IT&limit=50&offset=0`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -50,5 +55,5 @@ export default function useTracks() {
     },
   });
 
-  return { fetchedTracks, isLoading, isRefetching, error };
+  return { fetchedTracks, isLoading, isRefetching, error, refetch };
 }
