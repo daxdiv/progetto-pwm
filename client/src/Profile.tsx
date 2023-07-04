@@ -239,7 +239,7 @@ function Profile() {
           onChange={e => setDescription(e.target.value)}
         />
 
-        <div className="flex gap-2 mt-2">
+        <div className="flex flex-col md:flex-row lg:flex-row gap-2 mt-2">
           <Button
             type="button"
             text="Aggiorna profilo"
