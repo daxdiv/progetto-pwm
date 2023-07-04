@@ -78,7 +78,7 @@ const PlaylistCard: React.FC<Props> = ({
           "hover:scale-[1.015]": owned,
           "transition-transform": owned,
         },
-        `relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800 font-normal md:font-bold lg:font-bold text-xs md:text-sm lg:text-sm`
+        `relative flex flex-col border-2 border-gray-500 p-2 rounded-xl bg-gray-800 font-normal md:font-bold lg:font-bold text-xs md:text-sm lg:text-sm w-auto md:w-60 lg:w-60`
       )}
       key={playlist.id}
       onClick={() => {
