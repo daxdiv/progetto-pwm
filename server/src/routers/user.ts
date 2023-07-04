@@ -223,4 +223,33 @@ router.post("/save-playlist", async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Rimozione playlist salvata
+ */
+router.put(
+  "/un-save-playlist/:userId/:playlistId",
+  checkIds,
+  async (req: Request, res: Response) => {
+    const { userId, playlistId } = req.params;
+
+    try {
+      const user = await User.findOneAndUpdate(
+        { _id: userId },
+        { $pull: { savedPlaylists: playlistId } }
+      );
+
+      if (!user) {
+        res.status(404).json({ message: "Utente non trovato" });
+        return;
+      }
+
+      await user.save();
+
+      res.status(200).json({ message: "Playlist rimossa correttamente" });
+    } catch (error) {
+      res.status(500).json({ message: "Errore interno, riprovare più tardi" });
+    }
+  }
+);
+
 export default router;
