@@ -54,7 +54,7 @@ function SelectArtists({ setSelectedArtists }: Props) {
 
   return (
     <>
-      <p className="text-xs font-normal">Artisti preferiti</p>
+      <p className="text-xs font-normal">Artisti preferiti:*</p>
       <div className="flex gap-3">
         <AsyncSelect
           isMulti
