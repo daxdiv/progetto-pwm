@@ -12,6 +12,7 @@ import Profile from "./Profile";
 import Protected from "./Protected";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
+import { delay } from "./utils/helpers";
 import { useQuery } from "react-query";
 
 const FIVE_MINUTES_MS = 1000 * 60 * 5;
@@ -37,6 +38,30 @@ function App() {
       localStorage.setItem("access_token", data.access_token);
     },
   });
+  const { data, isLoading: isLoadingGenres } = useQuery<
+    { genres: string[] },
+    SpotifyApiError
+  >({
+    queryKey: ["fetch-genres"],
+    queryFn: async () => {
+      await delay();
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SPOTIFY_BASE_URL}/recommendations/available-genre-seeds`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      return await data;
+    },
+    onError: error => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <>
@@ -56,13 +81,21 @@ function App() {
         />
         <Route
           path="/sign-up"
-          element={<SignUp />}
+          element={
+            <SignUp
+              genres={data?.genres ?? []}
+              isLoadingGenres={isLoadingGenres}
+            />
+          }
         />
         <Route
           path="/profile"
           element={
             <Protected>
-              <Profile />
+              <Profile
+                genres={data?.genres ?? []}
+                isLoadingGenres={isLoadingGenres}
+              />
             </Protected>
           }
         />

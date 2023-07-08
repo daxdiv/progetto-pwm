@@ -3,9 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Button from "./components/ui/Button";
 import CenteredContainer from "./components/ui/CenteredContainer";
-import { FaTrashAlt } from "react-icons/fa";
 import Input from "./components/ui/Input";
 import PlaylistCard from "./components/PlaylistCard";
+import SelectArtists from "./components/SelectArtists";
+import SelectGenres from "./components/SelectGenres";
 import { Triangle } from "react-loader-spinner";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
@@ -13,7 +14,12 @@ import useAuth from "./hooks/useAuth";
 import useUser from "./hooks/useUser";
 import useUserPlaylists from "./hooks/useUserPlaylists";
 
-function Profile() {
+type Props = {
+  genres: string[];
+  isLoadingGenres: boolean;
+};
+
+function Profile({ genres, isLoadingGenres }: Props) {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -178,36 +184,17 @@ function Profile() {
           ref={passwordRef}
         />
 
-        {preferredGenres.size !== 0 && (
-          <>
-            <p className="text-sm font-normal">Modifica generi musicali preferiti:*</p>
+        <SelectGenres
+          data={genres}
+          isLoading={isLoadingGenres}
+          preferredGenres={preferredGenres}
+          setPreferredGenres={setPreferredGenres}
+        />
+        <SelectArtists setSelectedArtists={setPreferredArtists} />
 
-            <ul className="grid grid-cols-2 font-normal text-xs gap-2">
-              {Array.from(preferredGenres).map(genre => (
-                <li
-                  key={`selected-${genre}`}
-                  className="text-white bg-gray-800 w-full rounded-xl px-2 py-1 flex items-center justify-between gap-1"
-                >
-                  <span>{genre}</span>
-                  <FaTrashAlt
-                    className="text-red-500 cursor-pointer hover:scale-105 transition-transform"
-                    onClick={() => {
-                      setPreferredGenres(prevGenres => {
-                        const newGenres = new Set(prevGenres);
-                        newGenres.delete(genre);
-
-                        return newGenres;
-                      });
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-        {preferredArtists.size !== 0 && (
+        {/* {preferredArtists.size !== 0 && (
           <>
-            <p className="text-sm font-normal">Modifica generi musicali preferiti:*</p>
+            <p className="text-sm font-normal">Artisti preferiti:*</p>
 
             <ul className="grid grid-cols-2 font-normal text-xs gap-2">
               {Array.from(preferredArtists).map(artist => (
@@ -231,7 +218,7 @@ function Profile() {
               ))}
             </ul>
           </>
-        )}
+        )} */}
 
         <p className="font-normal justify-start flex text-xs">Qualcosa di te*</p>
         <textarea
@@ -246,12 +233,14 @@ function Profile() {
             type="button"
             text="Aggiorna profilo"
             size="sm"
+            disabled={isLoading || isRefetching || isLoadingGenres}
             onClick={handleUpdateProfile}
           />
           <Button
             type="button"
             text="Logout"
             size="sm"
+            disabled={isLoading || isRefetching || isLoadingGenres}
             onClick={handleLogout}
           />
           <Button
@@ -259,6 +248,7 @@ function Profile() {
             text="Elimina profilo"
             size="sm"
             variant="danger"
+            disabled={isLoading || isRefetching || isLoadingGenres}
             onClick={handleDeleteProfile}
           />
         </div>
