@@ -72,9 +72,9 @@ router.put("/:id", checkIds, async (req: Request, res: Response) => {
     res.status(200).json(updatedUser);
   } catch (error) {
     if (error.code === 11000) {
-      res
-        .status(400)
-        .json({ message: `${capitalize(Object.keys(error.keyValue)[0])} già esistente` });
+      res.status(400).json({
+        message: `${capitalize(Object.keys(error.keyValue)[0])} già esistente`,
+      });
       return;
     }
 
@@ -112,7 +112,9 @@ router.get("/:userId/playlists", checkIds, async (req: Request, res: Response) =
     const userPlaylists = await Playlist.find({ userId });
 
     if (!userPlaylists) {
-      res.status(404).json({ message: "Nessuna playlist trovata per questo utente" });
+      res.status(404).json({
+        message: "Nessuna playlist trovata per questo utente",
+      });
       return;
     }
 
