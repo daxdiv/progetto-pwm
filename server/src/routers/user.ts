@@ -201,7 +201,7 @@ router.post("/save-playlist", async (req: Request, res: Response) => {
       savedPlaylists: {
         $in: [playlistId],
       },
-    }).count();
+    }).countDocuments();
 
     if (isPlaylistSaved > 0) {
       res.status(400).json({ message: "Hai già salvato questa playlist" });
